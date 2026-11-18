@@ -1,0 +1,16 @@
+{
+  "name": "Neutral Healthcare Theme",
+  "dataColors": [
+    "#0F4C81",
+    "#008080",
+    "#D9534F",
+    "#F0AD4E",
+    "#5CB85C",
+    "#6C7A89",
+    "#8E44AD",
+    "#2C3E50"
+  ],
+  "background": "#F8F9FA",
+  "foreground": "#2B2D42",
+  "tableAccent": "#0F4C81"
+}

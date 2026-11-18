@@ -1,0 +1,8 @@
+{
+  "version": "4.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Smoking_and_Health_Analysis.Dataset"
+    }
+  }
+}

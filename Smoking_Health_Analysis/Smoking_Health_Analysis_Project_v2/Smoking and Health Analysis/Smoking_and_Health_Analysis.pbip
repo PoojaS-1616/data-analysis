@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "artifacts": [
+    {
+      "report": {
+        "path": "Smoking_and_Health_Analysis.Report"
+      }
+    }
+  ],
+  "settings": {}
+}

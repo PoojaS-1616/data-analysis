@@ -1,0 +1,38 @@
+{
+  "source_csv": "Smoking_Health_Analysis.csv",
+  "rows": 10000,
+  "distinct_patient_ids": 10000,
+  "missing_values": 0,
+  "smoking_status_counts": {
+    "Never Smoked": 4263,
+    "Current Smoker": 3015,
+    "Former Smoker": 2722
+  },
+  "patients_with_recorded_organ": 7227,
+  "patients_with_recorded_condition": 5772,
+  "average_cigarettes_per_day_current_smokers": 17.112106135986732,
+  "overall_average_cigarettes_per_day": 5.1593,
+  "bp_risk_counts": {
+    "High": 6049,
+    "Lower Range": 2500,
+    "Elevated": 1451
+  },
+  "avg_cholesterol_by_bp_risk": {
+    "Elevated": 195.73,
+    "High": 197.81,
+    "Lower Range": 195.35
+  },
+  "model_measure_count": 7,
+  "report_pages": [
+    "Executive Overview",
+    "Detailed Health Analysis"
+  ],
+  "slicer_sync_groups": {
+    "Gender": 2,
+    "Smoking Status": 2,
+    "Region": 2
+  },
+  "theme_registered": true,
+  "report_opens_on": "ExecutiveOverview",
+  "rendered_in_power_bi_desktop": false
+}

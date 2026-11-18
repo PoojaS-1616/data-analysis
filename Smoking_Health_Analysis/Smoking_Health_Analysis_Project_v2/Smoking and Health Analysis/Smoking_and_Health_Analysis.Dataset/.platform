@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Smoking_and_Health_Analysis"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a76e86a5-3c0b-48f0-b8d6-732a68471a4f"
+  }
+}

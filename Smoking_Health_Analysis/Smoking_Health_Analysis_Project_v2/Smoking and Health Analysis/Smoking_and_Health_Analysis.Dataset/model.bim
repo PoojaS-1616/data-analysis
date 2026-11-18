@@ -1,0 +1,829 @@
+{
+  "compatibilityLevel": 1606,
+  "model": {
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"Smoking_Health_Analysis\"]"
+      },
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "1"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "culture": "en-US",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "relationships": [
+      {
+        "name": "059996fe-3111-4703-949d-384e5d753574",
+        "fromColumn": "Diagnosis_Date",
+        "fromTable": "Smoking_Health_Analysis",
+        "joinOnDateBehavior": "datePartOnly",
+        "toColumn": "Date",
+        "toTable": "LocalDateTable_1df34161-0873-4b69-9eb4-c3dd6189bda6"
+      }
+    ],
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "Smoking_Health_Analysis",
+        "columns": [
+          {
+            "name": "Patient_ID",
+            "dataType": "string",
+            "lineageTag": "acdbff41-d0a8-48c8-9102-6c74c4bcb1ef",
+            "sourceColumn": "Patient_ID",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Age",
+            "dataType": "int64",
+            "formatString": "0",
+            "lineageTag": "2e12d348-662d-4bac-8917-c0d84f475cf5",
+            "sourceColumn": "Age",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Gender",
+            "dataType": "string",
+            "lineageTag": "bc1e39df-d39e-4b85-bac5-66e201f8bc21",
+            "sourceColumn": "Gender",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Region",
+            "dataType": "string",
+            "lineageTag": "e1167138-8ec5-4dbc-b1bc-3e788027406f",
+            "sourceColumn": "Region",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Diagnosis_Date",
+            "annotations": [
+              {
+                "name": "UnderlyingDateTimeDataType",
+                "value": "Date"
+              }
+            ],
+            "dataType": "dateTime",
+            "formatString": "yyyy-MM-dd",
+            "lineageTag": "a14d0522-4b69-4137-af89-d0589f78fcc5",
+            "sourceColumn": "Diagnosis_Date",
+            "summarizeBy": "none",
+            "variations": [
+              {
+                "name": "Variation",
+                "defaultHierarchy": {
+                  "hierarchy": "Date Hierarchy",
+                  "table": "LocalDateTable_1df34161-0873-4b69-9eb4-c3dd6189bda6"
+                },
+                "isDefault": true,
+                "relationship": "059996fe-3111-4703-949d-384e5d753574"
+              }
+            ]
+          },
+          {
+            "name": "Smoking_Status",
+            "dataType": "string",
+            "lineageTag": "3a732295-a003-49ed-9913-319ce2b1b53f",
+            "sourceColumn": "Smoking_Status",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Cigarettes_Per_Day",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "7e8f6b86-79e9-4f7e-8238-e34d9351b46b",
+            "sourceColumn": "Cigarettes_Per_Day",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Years_Smoking",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "412f4719-8358-46ec-a8dc-856170386007",
+            "sourceColumn": "Years_Smoking",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Diagnosed_Organ",
+            "dataType": "string",
+            "lineageTag": "a49063a4-3a65-4cd1-8d1c-b66a04dae923",
+            "sourceColumn": "Diagnosed_Organ",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Health_Condition",
+            "dataType": "string",
+            "lineageTag": "8489b537-3ba1-47f0-930e-77d3ce89394a",
+            "sourceColumn": "Health_Condition",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Total_Cholesterol_mg_dL",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "498c98b9-c15d-4a0d-94f4-2e03f0085c97",
+            "sourceColumn": "Total_Cholesterol_mg_dL",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Systolic_BP_mmHg",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "d46d74ef-d8e5-4f7d-9435-30481518dd22",
+            "sourceColumn": "Systolic_BP_mmHg",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Diastolic_BP_mmHg",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "ac49aec2-9a72-4ec9-9204-f3c5b52f8a13",
+            "sourceColumn": "Diastolic_BP_mmHg",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "BMI",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "3cb4be2d-9992-4b24-a439-e73a6ab5596e",
+            "sourceColumn": "BMI",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Resting_Heart_Rate_bpm",
+            "dataType": "double",
+            "formatString": "#,##0.00",
+            "lineageTag": "41ab2817-e837-4831-8687-bc7335633d16",
+            "sourceColumn": "Resting_Heart_Rate_bpm",
+            "summarizeBy": "sum"
+          },
+          {
+            "name": "Age Group",
+            "dataType": "string",
+            "expression": "SWITCH(TRUE(), 'Smoking_Health_Analysis'[Age] < 30, \"18–29\", 'Smoking_Health_Analysis'[Age] < 45, \"30–44\", 'Smoking_Health_Analysis'[Age] < 60, \"45–59\", \"60+\")",
+            "isDataTypeInferred": true,
+            "lineageTag": "a3584860-0157-4a9c-a080-4952a831a0ee",
+            "sortByColumn": "Age Group Sort",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Age Group Sort",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "expression": "SWITCH(TRUE(), 'Smoking_Health_Analysis'[Age] < 30, 1, 'Smoking_Health_Analysis'[Age] < 45, 2, 'Smoking_Health_Analysis'[Age] < 60, 3, 4)",
+            "isDataTypeInferred": true,
+            "lineageTag": "12ddf4d4-4338-4374-b457-fc32d807bf5a",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "BP Risk Category",
+            "dataType": "string",
+            "expression": "SWITCH(TRUE(), 'Smoking_Health_Analysis'[Systolic_BP_mmHg] >= 130 || 'Smoking_Health_Analysis'[Diastolic_BP_mmHg] >= 80, \"High\", 'Smoking_Health_Analysis'[Systolic_BP_mmHg] >= 120 && 'Smoking_Health_Analysis'[Diastolic_BP_mmHg] < 80, \"Elevated\", \"Lower Range\")",
+            "isDataTypeInferred": true,
+            "lineageTag": "5c2e4954-20e6-4f67-9eb5-dce84d0deb59",
+            "sortByColumn": "BP Risk Sort",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "BP Risk Sort",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "int64",
+            "expression": [
+              "SWITCH(",
+              "    TRUE(),",
+              "    'Smoking_Health_Analysis'[Systolic_BP_mmHg] >= 130 ||",
+              "    'Smoking_Health_Analysis'[Diastolic_BP_mmHg] >= 80, 3,",
+              "",
+              "    'Smoking_Health_Analysis'[Systolic_BP_mmHg] >= 120 &&",
+              "    'Smoking_Health_Analysis'[Diastolic_BP_mmHg] < 80, 2,",
+              "",
+              "    1",
+              ")"
+            ],
+            "isDataTypeInferred": true,
+            "lineageTag": "126b0ce2-faf0-4669-8b66-ddc1c40d67b8",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Pack Years",
+            "dataType": "double",
+            "expression": "('Smoking_Health_Analysis'[Cigarettes_Per_Day] / 20) * 'Smoking_Health_Analysis'[Years_Smoking]",
+            "formatString": "#,##0.00",
+            "isDataTypeInferred": true,
+            "lineageTag": "a3e9e371-c2b9-47f0-9b4f-0f198659847f",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          },
+          {
+            "name": "Exposure Category",
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "string",
+            "expression": "SWITCH(TRUE(), 'Smoking_Health_Analysis'[Smoking_Status] = \"Never Smoked\", \"Never Smoked\", 'Smoking_Health_Analysis'[Pack Years] = 0, \"Former Smokers (0 Current PY)\", 'Smoking_Health_Analysis'[Pack Years] < 10, \"Light (<10 Pack-Years)\", 'Smoking_Health_Analysis'[Pack Years] < 20, \"Moderate (10–19.9 Pack-Years)\", \"Heavy (20+ Pack-Years)\")",
+            "isDataTypeInferred": true,
+            "lineageTag": "91bbfa80-1ad9-447b-99c3-35acc4290226",
+            "sortByColumn": "Exposure Sort",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Exposure Sort",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "changedProperties": [
+              {
+                "property": "SortByColumn"
+              }
+            ],
+            "dataType": "int64",
+            "expression": [
+              "",
+              "SWITCH(",
+              "    TRUE(),",
+              "    'Smoking_Health_Analysis'[Smoking_Status] = \"Never Smoked\", 1,",
+              "    'Smoking_Health_Analysis'[Pack Years] = 0, 2,",
+              "    'Smoking_Health_Analysis'[Pack Years] < 10, 3,",
+              "    'Smoking_Health_Analysis'[Pack Years] < 20, 4,",
+              "    5",
+              ")"
+            ],
+            "formatString": "0",
+            "isDataTypeInferred": true,
+            "lineageTag": "ad11024b-a47b-4771-adb4-8aadc4cec4ed",
+            "summarizeBy": "sum",
+            "type": "calculated"
+          }
+        ],
+        "lineageTag": "e87a6935-10b8-4ee6-ae7d-640883d110a8",
+        "partitions": [
+          {
+            "name": "Smoking_Health_Analysis",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Source = Csv.Document(",
+                "        File.Contents(\"C:/Users/pooja/Downloads/Smoking and Health Analysis/Smoking_Health_Analysis.csv\"),",
+                "        [Delimiter=\",\", Encoding=65001, QuoteStyle=QuoteStyle.Csv]",
+                "    ),",
+                "    #\"Promoted Headers\" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),",
+                "    #\"Changed Type\" = Table.TransformColumnTypes(#\"Promoted Headers\",{",
+                "        {\"Patient_ID\", type text},",
+                "        {\"Age\", Int64.Type},",
+                "        {\"Gender\", type text},",
+                "        {\"Region\", type text},",
+                "        {\"Diagnosis_Date\", type date},",
+                "        {\"Smoking_Status\", type text},",
+                "        {\"Cigarettes_Per_Day\", type number},",
+                "        {\"Years_Smoking\", type number},",
+                "        {\"Diagnosed_Organ\", type text},",
+                "        {\"Health_Condition\", type text},",
+                "        {\"Total_Cholesterol_mg_dL\", type number},",
+                "        {\"Systolic_BP_mmHg\", type number},",
+                "        {\"Diastolic_BP_mmHg\", type number},",
+                "        {\"BMI\", type number},",
+                "        {\"Resting_Heart_Rate_bpm\", type number}",
+                "    })",
+                "in",
+                "    #\"Changed Type\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      },
+      {
+        "name": "_Measures",
+        "columns": [
+          {
+            "name": "Value",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "93f1b481-bcb0-4bae-895b-dfba306673a8",
+            "sourceColumn": "[Value]",
+            "type": "calculatedTableColumn"
+          }
+        ],
+        "lineageTag": "584298f3-b4e3-4e62-bf50-a90673d3b1b9",
+        "measures": [
+          {
+            "name": "Total Patients",
+            "expression": "COUNTROWS('Smoking_Health_Analysis')",
+            "formatString": "#,##0",
+            "lineageTag": "0d7bd427-5815-4db7-8d27-2a8ceda557e8"
+          },
+          {
+            "name": "Total Current Smokers",
+            "expression": [
+              "CALCULATE(",
+              "    COUNTROWS('Smoking_Health_Analysis'),",
+              "    'Smoking_Health_Analysis'[Smoking_Status] = \"Current Smoker\"",
+              ")"
+            ],
+            "formatString": "#,##0",
+            "lineageTag": "9a16b32f-85d0-4408-aa5a-0616abfb9dd9"
+          },
+          {
+            "name": "Patients with Recorded Organ",
+            "expression": [
+              "CALCULATE(",
+              "    COUNTROWS('Smoking_Health_Analysis'),",
+              "    'Smoking_Health_Analysis'[Diagnosed_Organ] <> \"No Recorded Organ Condition\"",
+              ")"
+            ],
+            "formatString": "#,##0",
+            "lineageTag": "e5570271-59a4-4d39-8436-4c91476f84bd"
+          },
+          {
+            "name": "Patients with Recorded Condition",
+            "expression": [
+              "CALCULATE(",
+              "    COUNTROWS('Smoking_Health_Analysis'),",
+              "    'Smoking_Health_Analysis'[Health_Condition] <> \"No Diagnosed Condition\"",
+              ")"
+            ],
+            "formatString": "#,##0",
+            "lineageTag": "c7b84276-94f2-4296-b032-c1b00e36f094"
+          },
+          {
+            "name": "Smoker Prevalence Rate",
+            "expression": "DIVIDE([Total Current Smokers], [Total Patients], 0)",
+            "formatString": "0.00%",
+            "lineageTag": "36ecaa34-69ec-49b6-974b-0813e0bb04ca"
+          },
+          {
+            "name": "Average Cigarettes Per Day",
+            "expression": "AVERAGE('Smoking_Health_Analysis'[Cigarettes_Per_Day])",
+            "formatString": "#,##0.00",
+            "lineageTag": "b3e23400-57a6-4c11-b273-174d4ec098e7"
+          },
+          {
+            "name": "Average Total Cholesterol",
+            "expression": "AVERAGE('Smoking_Health_Analysis'[Total_Cholesterol_mg_dL])",
+            "formatString": "#,##0.00",
+            "lineageTag": "f4a043c9-c2f1-4258-9d2c-6a593166a0be"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "_Measures",
+            "mode": "import",
+            "source": {
+              "expression": "Row(\"Value\", BLANK())",
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "DateTableTemplate_83ae0582-9952-4fa3-aad1-1bb9037543fb",
+        "annotations": [
+          {
+            "name": "__PBI_TemplateDateTable",
+            "value": "true"
+          },
+          {
+            "name": "DefaultItem",
+            "value": "DateHierarchy"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "20681abb-facc-4681-982a-df39c3e0d283",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "ce321613-1d93-4564-a6ac-5de782055aa9",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "589387e5-190f-4b03-a8e8-a3232ced8dca",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "a892251d-a9fa-45dc-a2ef-e1061eef40ed",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "7c1bc697-c617-4433-8cf1-ce0e57605fb7",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "9bcf66c9-793a-40bc-b8b1-a0ac2958fce7",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "618c217e-e884-49e6-b4df-162f7c749db3",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "c9d4355e-ed17-4e8d-9669-41f6f0f695ac",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "6176f0ea-959f-49e1-bb13-ffa21e13813d",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "88dd531b-5335-45bd-8c06-52b34b555355",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "faef0c59-31c0-4487-ab59-67b9ec80bd7c",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "5fba7035-52d3-42ce-bba7-b873276b0907"
+          }
+        ],
+        "isHidden": true,
+        "isPrivate": true,
+        "lineageTag": "16330868-cddc-4fc6-b7b6-36307a45cc94",
+        "partitions": [
+          {
+            "name": "DateTableTemplate_83ae0582-9952-4fa3-aad1-1bb9037543fb",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(2015,1,1), Date(2015,1,1))",
+              "type": "calculated"
+            }
+          }
+        ]
+      },
+      {
+        "name": "LocalDateTable_1df34161-0873-4b69-9eb4-c3dd6189bda6",
+        "annotations": [
+          {
+            "name": "__PBI_LocalDateTable",
+            "value": "true"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Date",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              }
+            ],
+            "dataCategory": "PaddedDateTableDates",
+            "dataType": "dateTime",
+            "formatString": "General Date",
+            "isHidden": true,
+            "isNameInferred": true,
+            "lineageTag": "8bd29df3-4986-499f-ba3e-d6bb31acf0e1",
+            "sourceColumn": "[Date]",
+            "summarizeBy": "none",
+            "type": "calculatedTableColumn"
+          },
+          {
+            "name": "Year",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Year"
+              }
+            ],
+            "dataCategory": "Years",
+            "dataType": "int64",
+            "expression": "YEAR([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "cf880096-1044-455c-90fb-542ee5928e14",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "MonthNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "MonthNumber"
+              }
+            ],
+            "dataCategory": "MonthOfYear",
+            "dataType": "int64",
+            "expression": "MONTH([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "56f12b08-090b-4a4d-9cd2-ffb60421b15c",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Month",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Month"
+              }
+            ],
+            "dataCategory": "Months",
+            "dataType": "string",
+            "expression": "FORMAT([Date], \"MMMM\")",
+            "isHidden": true,
+            "lineageTag": "ca9b7448-a1b3-4d09-afc7-3163afbc3529",
+            "sortByColumn": "MonthNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "QuarterNo",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "QuarterNumber"
+              }
+            ],
+            "dataCategory": "QuarterOfYear",
+            "dataType": "int64",
+            "expression": "INT(([MonthNo] + 2) / 3)",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "50faf837-3889-487b-a96e-d5cae3dd6acc",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Quarter",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Quarter"
+              }
+            ],
+            "dataCategory": "Quarters",
+            "dataType": "string",
+            "expression": "\"Qtr \" & [QuarterNo]",
+            "isHidden": true,
+            "lineageTag": "36924161-f3fa-4b0c-9d07-ee83daca8fba",
+            "sortByColumn": "QuarterNo",
+            "summarizeBy": "none",
+            "type": "calculated"
+          },
+          {
+            "name": "Day",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "User"
+              },
+              {
+                "name": "TemplateId",
+                "value": "Day"
+              }
+            ],
+            "dataCategory": "DayOfMonth",
+            "dataType": "int64",
+            "expression": "DAY([Date])",
+            "formatString": "0",
+            "isHidden": true,
+            "lineageTag": "faa5d039-c2ca-455f-881e-c6f8c421e18c",
+            "summarizeBy": "none",
+            "type": "calculated"
+          }
+        ],
+        "hierarchies": [
+          {
+            "name": "Date Hierarchy",
+            "annotations": [
+              {
+                "name": "TemplateId",
+                "value": "DateHierarchy"
+              }
+            ],
+            "levels": [
+              {
+                "name": "Year",
+                "column": "Year",
+                "lineageTag": "d57022e5-f09b-45c9-9b6c-9eb1dcee8722",
+                "ordinal": 0
+              },
+              {
+                "name": "Quarter",
+                "column": "Quarter",
+                "lineageTag": "20b1e954-1787-43b2-9ffb-d7f65e927142",
+                "ordinal": 1
+              },
+              {
+                "name": "Month",
+                "column": "Month",
+                "lineageTag": "5ae1e7ba-7ffe-4deb-8f3c-3d56690be5e3",
+                "ordinal": 2
+              },
+              {
+                "name": "Day",
+                "column": "Day",
+                "lineageTag": "876108c2-1564-4b4d-af23-9e4324bfc64b",
+                "ordinal": 3
+              }
+            ],
+            "lineageTag": "9028801a-4668-4f78-afb3-f0e7dc4c4573"
+          }
+        ],
+        "isHidden": true,
+        "lineageTag": "b725e3b4-45b1-4faa-8329-bb0fdff36982",
+        "partitions": [
+          {
+            "name": "LocalDateTable_1df34161-0873-4b69-9eb4-c3dd6189bda6",
+            "mode": "import",
+            "source": {
+              "expression": "Calendar(Date(Year(MIN('Smoking_Health_Analysis'[Diagnosis_Date])), 1, 1), Date(Year(MAX('Smoking_Health_Analysis'[Diagnosis_Date])), 12, 31))",
+              "type": "calculated"
+            }
+          }
+        ],
+        "showAsVariationsOnly": true
+      }
+    ]
+  }
+}
