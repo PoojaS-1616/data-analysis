@@ -1,9 +1,10 @@
-# Python
+# Python & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+.venv/
 env/
 venv/
 ENV/
@@ -24,8 +25,12 @@ wheels/
 *.egg
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
 */.ipynb_checkpoints/*
+
+# Environment variables & secrets
+.env
+.env.*
 
 # IDEs & OS
 .vscode/
@@ -35,17 +40,20 @@ wheels/
 .DS_Store
 Thumbs.db
 
-# Project archives and local database
+# Project archives and local databases
 *.zip
 *.db
+*.sqlite
+*.sqlite3
 
 # Restricted source dataset & derived cleaned CSV (not redistributed in GitHub)
 BlinkIT Grocery Data.xlsx
 BlinkIT_Grocery_Data.xlsx
 BlinkIT_Grocery_Data_Cleaned.csv
 
-# Temporary UI exports and intermediate data files
+# Temporary UI exports, intermediate data files, and logs
 blinkit_missing_sku_candidates.csv
 blinkit_recommended_expansion_skus.csv
 *.tmp
 *.bak
+*.log

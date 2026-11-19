@@ -87,10 +87,30 @@ def validate_readonly_sql(query: str) -> tuple[bool, str]:
 def load_data() -> pd.DataFrame:
     csv_path = BASE_DIR / "BlinkIT_Grocery_Data_Cleaned.csv"
     if not csv_path.exists():
-        st.error(f"Cleaned dataset not found at '{csv_path}'. Run `python run_analysis.py` first.")
+        st.error(
+            f"Cleaned dataset not found at `{csv_path}`.\n\n"
+            "**Local setup required:** The restricted source dataset is not redistributed in GitHub. "
+            "Place your authorized `BlinkIT Grocery Data.xlsx` (or `BlinkIT_Grocery_Data.xlsx`) workbook in the "
+            "project directory, then generate the cleaned CSV:\n"
+            "- Windows PowerShell: `.\\.venv\\Scripts\\python.exe run_analysis.py`\n"
+            "- macOS / Linux: `python run_analysis.py`"
+        )
         st.stop()
-    df = pd.read_csv(csv_path)
-    required = {"Item Identifier", "Item Type", "Outlet Identifier", "Outlet Type", "Outlet Location Type", "Sales", "Rating"}
+    try:
+        df = pd.read_csv(csv_path)
+    except Exception as exc:
+        st.error(f"Failed to read cleaned dataset at `{csv_path}`.\n\nDetails: {exc}")
+        st.stop()
+    required = {
+        "Item Identifier",
+        "Item Type",
+        "Outlet Identifier",
+        "Outlet Type",
+        "Outlet Location Type",
+        "Outlet Size",
+        "Sales",
+        "Rating",
+    }
     missing = required - set(df.columns)
     if missing:
         st.error(f"Dataset is missing required columns: {sorted(missing)}")
@@ -105,13 +125,26 @@ def load_data() -> pd.DataFrame:
 def get_readonly_db_connection() -> sqlite3.Connection:
     db_path = BASE_DIR / "blinkit_warehouse.db"
     if not db_path.exists():
-        if str(BASE_DIR) not in sys.path:
-            sys.path.insert(0, str(BASE_DIR))
-        import build_warehouse
-        build_warehouse.build_warehouse(verbose=False)
-    # Open strictly read-only via SQLite URI
-    db_uri = f"file:{db_path.as_posix()}?mode=ro"
-    return sqlite3.connect(db_uri, uri=True, check_same_thread=False)
+        try:
+            if str(BASE_DIR) not in sys.path:
+                sys.path.insert(0, str(BASE_DIR))
+            import build_warehouse
+            build_warehouse.build_warehouse(verbose=False)
+        except Exception as exc:
+            st.error(
+                f"SQLite warehouse `{db_path.name}` was missing and automatic build failed.\n\n"
+                "Verify `BlinkIT_Grocery_Data_Cleaned.csv` and `blinkit_warehouse.sql` are present, then run "
+                "`.\\.venv\\Scripts\\python.exe build_warehouse.py` (or `python build_warehouse.py`).\n\n"
+                f"Details: {exc}"
+            )
+            st.stop()
+    try:
+        # Open strictly read-only via SQLite URI
+        db_uri = f"file:{db_path.as_posix()}?mode=ro"
+        return sqlite3.connect(db_uri, uri=True, check_same_thread=False)
+    except Exception as exc:
+        st.error(f"Could not open SQLite warehouse `{db_path}` in read-only mode.\n\nDetails: {exc}")
+        st.stop()
 
 
 def format_compact(amount: float) -> str:
@@ -157,6 +190,15 @@ with st.sidebar:
         "• **Source:** Rebranded public retail catalogue dataset (BigMart Sales lineage)."
     )
     st.markdown("---")
+    st.subheader("Dashboard Guide")
+    st.caption(
+        "1. **Assortment Gap Scenario** — Observed SKU breadth vs. user-controlled hypothetical scenarios.\n"
+        "2. **Sales Variance Decomposition** — Proof that `Sales` is SKU-driven ($R^2 = 99.97\\%$).\n"
+        "3. **Store-Format Audit** — Naive vs. format-controlled tiers (Simpson's Paradox).\n"
+        "4. **Missing-SKU Explorer** — Filter & export SKUs stocked in Supermarkets but absent from Grocery Stores.\n"
+        "5. **Read-Only SQL Explorer** — Query the SQLite Star Schema (`mode=ro`)."
+    )
+    st.markdown("---")
     st.info(
         "All KPIs and SQL views are computed dynamically from the cleaned dataset and read-only SQLite Star Schema."
     )
@@ -170,10 +212,30 @@ st.markdown(
 )
 
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Sum of Recorded Sales Metric", format_compact(total_catalogue_value), f"+{network_gap_pct:.2f}% hypothetical gap")
-col2.metric("Mean Recorded Sales Value", f"{mean_sales_value:,.2f}", f"Avg within-SKU SD: {within_sku_sd:.2f}")
-col3.metric("Network SKU Depth", f"{total_skus:,} SKUs", f"{total_categories} Item Categories")
-col4.metric("Outlets Analyzed", f"{total_stores} Outlets", f"{sup_count} Supermarkets · {groc_count} Grocery Stores")
+col1.metric(
+    "Sum of Recorded Sales Metric",
+    format_compact(total_catalogue_value),
+    f"+{network_gap_pct:.2f}% hypothetical gap",
+    help=f"Sum of the Recorded Sales value across all {len(df):,} product-outlet catalogue listings in original dataset units (not verified transaction revenue).",
+)
+col2.metric(
+    "Mean Recorded Sales Value",
+    f"{mean_sales_value:,.2f}",
+    f"Avg within-SKU SD: {within_sku_sd:.2f}",
+    help="Mean Recorded Sales value per product-outlet record. Low within-SKU standard deviation relative to overall SD confirms SKU-level unit-price behavior.",
+)
+col3.metric(
+    "Network SKU Depth",
+    f"{total_skus:,} SKUs",
+    f"{total_categories} Item Categories",
+    help="Count of distinct Item Identifiers (SKUs) across all product categories in the cleaned catalogue.",
+)
+col4.metric(
+    "Outlets Analyzed",
+    f"{total_stores} Outlets",
+    f"{sup_count} Supermarkets · {groc_count} Grocery Stores",
+    help="Total distinct outlets in the network, split by Supermarket formats vs. Grocery Stores.",
+)
 
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Assortment Gap Scenario",
@@ -439,6 +501,8 @@ with tab4:
         data=filtered_missing.to_csv(index=False).encode("utf-8"),
         file_name="blinkit_missing_sku_candidates.csv",
         mime="text/csv",
+        disabled=filtered_missing.empty,
+        help="Exports the currently filtered candidate SKUs. Disabled when no SKUs match the active filters.",
     )
 
 # ==============================================================================
