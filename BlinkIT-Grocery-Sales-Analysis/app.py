@@ -1,52 +1,37 @@
 """
-Blinkit Quick-Commerce Catalogue Architecture & Dark Store Assortment Simulator
-==============================================================================
-Production Streamlit Executive Dashboard & Decision Engine
-------------------------------------------------------------------------------
-Project: BlinkIT Grocery Sales & Assortment Analysis
-Developed by: Pooja Singh
-Architecture: Integrated with SQLite Dimensional Star Schema (blinkit_warehouse.db)
+BlinkIT Grocery Catalogue Architecture & Assortment Explorer
+============================================================
+Interactive Streamlit Dashboard backed by SQLite Star Schema (blinkit_warehouse.db)
+
+Key Design Principles:
+- Script-relative paths (works from any working directory)
+- Read-only SQLite connection (mode=ro) + strict single-statement SELECT/WITH SQL guard
+- Currency-honest reporting (currency is unspecified in source; displayed in original dataset units)
+- Clear separation between verified catalogue metrics and hypothetical user-controlled scenarios
 """
 
-import os
-import sys
+from pathlib import Path
+import re
 import sqlite3
+import sys
 import pandas as pd
-import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = Path(__file__).resolve().parent
 
-# ------------------------------------------------------------------------------
-# PAGE CONFIGURATION & STYLING
-# ------------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Blinkit Quick-Commerce Assortment Simulator",
-    page_icon="⚡",
+    page_title="BlinkIT Catalogue Pricing & Assortment Explorer",
+    page_icon="🛒",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
-# Custom CSS for executive styling
-st.markdown("""
+st.markdown(
+    """
 <style>
-    .metric-card {
-        background-color: #f8f9fa;
-        border-left: 5px solid #ffcc00;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        font-weight: 600;
-    }
+    .stTabs [data-baseweb="tab-list"] { gap: 8px; }
+    .stTabs [data-baseweb="tab"] { padding-top: 10px; padding-bottom: 10px; font-weight: 600; }
     .insight-box {
         background-color: #17263c;
         color: #e2ecf7 !important;
@@ -58,9 +43,7 @@ st.markdown("""
         margin-bottom: 15px;
         font-size: 0.95rem;
     }
-    .insight-box b {
-        color: #6bb9f0 !important;
-    }
+    .insight-box b { color: #6bb9f0 !important; }
     .warning-box {
         background-color: #332810;
         color: #fceecb !important;
@@ -72,450 +55,431 @@ st.markdown("""
         margin-bottom: 15px;
         font-size: 0.95rem;
     }
-    .warning-box b {
-        color: #ffd740 !important;
-    }
+    .warning-box b { color: #ffd740 !important; }
 </style>
+""",
+    unsafe_allow_html=True,
+)
 
-""", unsafe_allow_html=True)
 
-# ------------------------------------------------------------------------------
-# DATA INGESTION & CACHING
-# ------------------------------------------------------------------------------
+def validate_readonly_sql(query: str) -> tuple[bool, str]:
+    """Validate that a user query is a single read-only SELECT or WITH statement."""
+    if not query or not query.strip():
+        return False, "Query cannot be empty."
+    # Strip SQL block comments and single-line comments
+    cleaned = re.sub(r"/\*.*?\*/", " ", query, flags=re.S)
+    cleaned = re.sub(r"--[^\n]*", " ", cleaned)
+    cleaned = cleaned.strip()
+    # Allow at most one optional trailing semicolon
+    if cleaned.endswith(";"):
+        cleaned = cleaned[:-1].strip()
+    if ";" in cleaned:
+        return False, "Multiple SQL statements are not permitted."
+    if not re.match(r"^(SELECT|WITH)\b", cleaned, flags=re.I):
+        return False, "Only read-only SELECT or WITH queries are permitted."
+    forbidden = r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|REPLACE|ATTACH|DETACH|PRAGMA|VACUUM|REINDEX|BEGIN|COMMIT|ROLLBACK)\b"
+    if re.search(forbidden, cleaned, flags=re.I):
+        return False, "Modification, DDL, and PRAGMA statements are blocked."
+    return True, cleaned
+
+
 @st.cache_data
-def load_data():
-    csv_path = os.path.join(BASE_DIR, 'BlinkIT_Grocery_Data_Cleaned.csv')
-    if not os.path.exists(csv_path):
-        csv_path = 'BlinkIT_Grocery_Data_Cleaned.csv'
-    if not os.path.exists(csv_path):
-        st.error(f"Dataset '{csv_path}' not found. Please ensure it exists in the workspace.")
+def load_data() -> pd.DataFrame:
+    csv_path = BASE_DIR / "BlinkIT_Grocery_Data_Cleaned.csv"
+    if not csv_path.exists():
+        st.error(f"Cleaned dataset not found at '{csv_path}'. Run `python run_analysis.py` first.")
         st.stop()
     df = pd.read_csv(csv_path)
+    required = {"Item Identifier", "Item Type", "Outlet Identifier", "Outlet Type", "Outlet Location Type", "Sales", "Rating"}
+    missing = required - set(df.columns)
+    if missing:
+        st.error(f"Dataset is missing required columns: {sorted(missing)}")
+        st.stop()
+    if df.empty:
+        st.error("Loaded dataset is empty.")
+        st.stop()
     return df
 
+
 @st.cache_resource
-def get_db_connection():
-    db_path = os.path.join(BASE_DIR, 'blinkit_warehouse.db')
-    if not os.path.exists(db_path):
-        db_path = 'blinkit_warehouse.db'
-    if not os.path.exists(db_path):
-        # Auto-build warehouse if db is missing
-        if BASE_DIR not in sys.path:
-            sys.path.insert(0, BASE_DIR)
+def get_readonly_db_connection() -> sqlite3.Connection:
+    db_path = BASE_DIR / "blinkit_warehouse.db"
+    if not db_path.exists():
+        if str(BASE_DIR) not in sys.path:
+            sys.path.insert(0, str(BASE_DIR))
         import build_warehouse
-        build_warehouse.build_warehouse()
-    conn = sqlite3.connect(db_path, check_same_thread=False)
-    return conn
+        build_warehouse.build_warehouse(verbose=False)
+    # Open strictly read-only via SQLite URI
+    db_uri = f"file:{db_path.as_posix()}?mode=ro"
+    return sqlite3.connect(db_uri, uri=True, check_same_thread=False)
 
-df = load_data()
-conn = get_db_connection()
 
-# ------------------------------------------------------------------------------
-# SIDEBAR CONTROLS
-# ------------------------------------------------------------------------------
-with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/2/2f/Blinkit-yellow-app-icon.svg", width=65)
-    st.title("Blinkit Executive Portal")
-    st.caption("Quick-Commerce Dark Store Economics & Catalogue Strategy")
-    st.markdown("---")
-
-    st.subheader("Dataset units")
-    st.caption("Currency is not specified in the source. Values are shown without conversion.")
-    rate = 1.0
-    symbol = ""
-
-    st.markdown("---")
-    st.markdown("### 🎯 Executive Navigation")
-    st.info(
-        "This tool supports commercial category managers and dark store operators in evaluating "
-        "SKU assortment breadth, inventory holding costs, and format economics."
-    )
-    st.markdown("---")
-    st.caption("Flagship Portfolio Project · Interactive Decision Support Suite")
-
-# ------------------------------------------------------------------------------
-# HEADER & NETWORK METRICS
-# ------------------------------------------------------------------------------
-def format_compact_currency(amount, sym=""):
+def format_compact(amount: float) -> str:
     if abs(amount) >= 1_000_000:
         return f"{amount / 1_000_000:.2f}M"
-    elif abs(amount) >= 1_000:
+    if abs(amount) >= 1_000:
         return f"{amount / 1_000:.1f}k"
     return f"{amount:,.2f}"
 
-st.title("⚡ Blinkit Catalogue Pricing & Assortment Decision Suite")
+
+df = load_data()
+conn = get_readonly_db_connection()
+
+# --- Dynamic Network Metrics (zero hardcoded numbers) ---
+total_catalogue_value = float(df["Sales"].sum())
+mean_sales_value = float(df["Sales"].mean())
+total_skus = int(df["Item Identifier"].nunique())
+total_categories = int(df["Item Type"].nunique())
+total_stores = int(df["Outlet Identifier"].nunique())
+
+outlet_counts = df.groupby(["Outlet Identifier", "Outlet Type"])["Item Identifier"].count()
+sup_mask = outlet_counts.index.get_level_values("Outlet Type") != "Grocery Store"
+groc_mask = ~sup_mask
+sup_count = int(sup_mask.sum())
+groc_count = int(groc_mask.sum())
+sup_avg_skus = float(outlet_counts[sup_mask].mean()) if sup_count else 0.0
+groc_avg_skus = float(outlet_counts[groc_mask].mean()) if groc_count else 0.0
+avg_sku_gap = max(sup_avg_skus - groc_avg_skus, 0.0)
+sup_mean_sales = float(df.loc[df["Outlet Type"] != "Grocery Store", "Sales"].mean()) if sup_count else mean_sales_value
+network_catalogue_gap = avg_sku_gap * groc_count * sup_mean_sales
+network_gap_pct = (network_catalogue_gap / total_catalogue_value * 100.0) if total_catalogue_value > 0 else 0.0
+within_sku_sd = float(df.groupby("Item Identifier")["Sales"].std().mean())
+
+# --- Sidebar ---
+with st.sidebar:
+    st.markdown("## 🛒 BlinkIT Catalogue Explorer")
+    st.caption("Product-Outlet Assortment & Pricing Architecture")
+    st.markdown("---")
+    st.subheader("Data Units & Scope")
+    st.caption(
+        "• **Records:** Product-outlet catalogue listings (no transaction quantities or timestamps).\n"
+        "• **Units:** Currency is unspecified in the source; values are shown in original dataset units.\n"
+        "• **Source:** Rebranded public retail catalogue dataset (BigMart Sales lineage)."
+    )
+    st.markdown("---")
+    st.info(
+        "All KPIs and SQL views are computed dynamically from the cleaned dataset and read-only SQLite Star Schema."
+    )
+
+# --- Header ---
+st.title("🛒 BlinkIT Catalogue Pricing & Assortment Explorer")
 st.markdown(
-    f"**Objective:** Diagnostic analysis of catalogue pricing architecture, store-format unit economics, "
-    f"and simulation of dark store SKU expansion to capture **+{format_compact_currency(109009*rate, symbol)}** in inventory potential."
+    f"**Scope:** Diagnostic analysis of {len(df):,} product-outlet records across {total_skus:,} SKUs and {total_stores} outlets. "
+    f"Closing the average Grocery Store assortment gap ({avg_sku_gap:.1f} SKUs/store vs Supermarket benchmark) represents a "
+    f"hypothetical catalogue-value addition of **+{format_compact(network_catalogue_gap)} units** (+{network_gap_pct:.2f}% of current catalogue sum; not a revenue forecast)."
 )
 
 col1, col2, col3, col4 = st.columns(4)
-total_catalogue_value = df['Sales'].sum() * rate
-avg_unit_mrp = df['Sales'].mean() * rate
-total_skus = df['Item Identifier'].nunique()
-total_stores = df['Outlet Identifier'].nunique()
+col1.metric("Sum of Recorded Sales Metric", format_compact(total_catalogue_value), f"+{network_gap_pct:.2f}% hypothetical gap")
+col2.metric("Mean Recorded Sales Value", f"{mean_sales_value:,.2f}", f"Avg within-SKU SD: {within_sku_sd:.2f}")
+col3.metric("Network SKU Depth", f"{total_skus:,} SKUs", f"{total_categories} Item Categories")
+col4.metric("Outlets Analyzed", f"{total_stores} Outlets", f"{sup_count} Supermarkets · {groc_count} Grocery Stores")
 
-within_sku_sd = df.groupby('Item Identifier')['Sales'].std().mean() * rate
-col1.metric("Sum of Sales (all listings)", format_compact_currency(total_catalogue_value, symbol), "+9.07% potential gap")
-col2.metric("Mean Sales Value per Listing", f"{symbol}{avg_unit_mrp:,.2f}", f"Avg within-SKU SD: {within_sku_sd:.2f}")
-col3.metric("Network SKU Depth", f"{total_skus:,} SKUs", "16 Item Categories")
-col4.metric("Fulfillment Outlets", f"{total_stores} Dark Stores", "8 Supermarkets · 2 Grocery Stores")
-
-# ------------------------------------------------------------------------------
-# TABS ARCHITECTURE
-# ------------------------------------------------------------------------------
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📈 Assortment Expansion Simulator", 
+    "📊 Assortment Gap Scenario",
     "🔬 Sales Variance Decomposition",
-    "⚖️ Simpson's Paradox (Tier 2 Audit)", 
-    "🎯 SKU Recommendation Engine",
-    "🗄️ SQL Star Schema Explorer"
+    "⚖️ Store-Format Audit (Simpson's Paradox)",
+    "🎯 Missing-SKU Explorer",
+    "🗄️ Read-Only SQL Explorer",
 ])
 
 # ==============================================================================
-# TAB 1: DARK STORE ASSORTMENT EXPANSION SIMULATOR
+# TAB 1: HYPOTHETICAL CATALOGUE ASSORTMENT SCENARIO
 # ==============================================================================
 with tab1:
-    st.header("🏪 Dark Store Assortment Breadth & Inventory Simulator")
+    st.header("🏪 Grocery Store Assortment Breadth & Hypothetical Scenario")
     st.markdown(
-        "Grocery stores (`OUT010` and `OUT019`) currently stock only ~**541.5 SKUs** compared to "
-        "~**930.0 SKUs** in Supermarket dark stores. This interactive simulator models the working "
-        "capital, sales potential, and gross margin of closing this assortment gap."
-    )
-    st.caption(
-        "Illustrative scenario: catalogue value uses the mean `Sales` value per listing (units and currency unspecified), "
-        "and turns, margin and holding cost are your own assumptions. The dataset has no units sold, so this is not a demand forecast."
+        f"Grocery stores (`OUT010`, `OUT019`) list an average of **{groc_avg_skus:.1f} SKUs** compared to "
+        f"**{sup_avg_skus:.1f} SKUs** in Supermarkets. Because the dataset contains **product-outlet listings without unit quantities, "
+        f"timestamps, or COGS**, the calculator below models **catalogue breadth expansion** plus an optional, explicitly hypothetical scenario."
     )
 
     sim_col1, sim_col2 = st.columns([1, 2])
+    grocery_outlets = sorted(df.loc[df["Outlet Type"] == "Grocery Store", "Outlet Identifier"].unique().tolist())
 
     with sim_col1:
-        st.subheader("🕹️ Simulation Levers")
-        target_store = st.selectbox("Select Target Dark Store", ["OUT010 (Tier 3 · Size Unknown)", "OUT019 (Tier 1 · Small)"])
-        target_store_id = target_store.split()[0]
-
-        # Extract current store stats
-        store_data = df[df['Outlet Identifier'] == target_store_id]
-        current_skus = len(store_data)
-        supermarket_avg_skus = 930
-        max_missing = supermarket_avg_skus - current_skus
+        st.subheader("⚙️ Scenario Inputs (User Assumptions)")
+        if not grocery_outlets:
+            st.warning("No Grocery Store outlets found in the dataset.")
+            st.stop()
+        store_labels = {
+            oid: f"{oid} ({df.loc[df['Outlet Identifier']==oid, 'Outlet Location Type'].iloc[0]} · Size {df.loc[df['Outlet Identifier']==oid, 'Outlet Size'].iloc[0]})"
+            for oid in grocery_outlets
+        }
+        target_store_id = st.selectbox("Select Target Grocery Store", grocery_outlets, format_func=lambda x: store_labels[x])
+        store_data = df[df["Outlet Identifier"] == target_store_id]
+        current_skus = int(len(store_data))
+        max_missing = max(int(round(sup_avg_skus)) - current_skus, 0)
 
         skus_to_add = st.slider(
-            "Number of Missing SKUs to Onboard", 
-            min_value=0, 
-            max_value=int(max_missing), 
-            value=int(max_missing),
-            help=f"Closing the gap completely requires adding {max_missing} SKUs."
+            "Hypothetical Missing SKUs Added",
+            min_value=0,
+            max_value=max(max_missing, 1),
+            value=max_missing,
+            help=f"Reaching the Supermarket benchmark ({sup_avg_skus:.1f} SKUs) adds {max_missing} SKUs.",
         )
-
-        target_gross_margin = st.slider("Target Gross Margin %", min_value=10.0, max_value=35.0, value=22.5, step=0.5) / 100.0
-        inventory_turns_per_year = st.slider("Projected Annual Inventory Turns (Velocity)", min_value=4.0, max_value=24.0, value=12.0, step=1.0)
-        holding_cost_pct = st.slider("Annual Working Capital & Holding Cost %", min_value=5.0, max_value=25.0, value=15.0, step=0.5) / 100.0
+        st.caption("Optional illustrative unit-velocity assumption (not observed in dataset):")
+        assumed_units_per_sku = st.slider("Assumed Annual Units Sold per Added SKU (Hypothetical)", 1, 24, 6, step=1)
+        assumed_margin_pct = st.slider("Assumed Gross Margin % (Hypothetical)", 5.0, 35.0, 20.0, step=1.0) / 100.0
 
     with sim_col2:
-        st.subheader("📊 Projected Financial & Inventory Impact")
-        
-        # Calculate simulation
-        current_val = store_data['Sales'].sum() * rate
-        avg_price = df[df['Outlet Type'] != 'Grocery Store']['Sales'].mean() * rate
-        incremental_inventory_value = skus_to_add * avg_price
-        new_total_inventory_value = current_val + incremental_inventory_value
+        st.subheader("📈 Observed Catalogue vs. Hypothetical Scenario")
+        current_val = float(store_data["Sales"].sum())
+        incremental_catalogue_val = skus_to_add * sup_mean_sales
+        projected_catalogue_val = current_val + incremental_catalogue_val
+        expansion_pct = (incremental_catalogue_val / current_val * 100.0) if current_val > 0 else 0.0
 
-        annual_gross_merchandise_value = incremental_inventory_value * inventory_turns_per_year
-        annual_gross_profit = annual_gross_merchandise_value * target_gross_margin
-        annual_holding_cost = incremental_inventory_value * holding_cost_pct
-        net_annual_operating_contribution = annual_gross_profit - annual_holding_cost
+        # Explicitly labelled illustrative scenario
+        illustrative_gross_sales = incremental_catalogue_val * assumed_units_per_sku
+        illustrative_gross_margin = illustrative_gross_sales * assumed_margin_pct
 
-        m_col1, m_col2, m_col3 = st.columns(3)
-        m_col1.metric("Catalogue Value Added", format_compact_currency(incremental_inventory_value, symbol), f"+{(incremental_inventory_value/current_val)*100:.1f}% expansion")
-        m_col2.metric("Modelled Annual Sales", format_compact_currency(annual_gross_merchandise_value, symbol), f"{inventory_turns_per_year:.0f} turns/yr")
-        m_col3.metric("Net Annual Contribution", format_compact_currency(net_annual_operating_contribution, symbol), f"After {holding_cost_pct*100:.1f}% holding cost")
+        m1, m2, m3 = st.columns(3)
+        m1.metric("Catalogue Value Added (1× Listing)", format_compact(incremental_catalogue_val), f"+{expansion_pct:.1f}% vs current store")
+        m2.metric("Hypothetical Gross Sales", format_compact(illustrative_gross_sales), f"Assumed {assumed_units_per_sku} units/SKU/yr")
+        m3.metric("Hypothetical Gross Margin", format_compact(illustrative_gross_margin), f"At assumed {assumed_margin_pct*100:.0f}% margin")
 
-        # Visualizing before and after
         chart_df = pd.DataFrame({
-            'Metric': ['Current Catalogue Value', 'Incremental Uplift', 'Projected Total Value'],
-            'Amount': [current_val, incremental_inventory_value, new_total_inventory_value]
+            "Stage": ["Current Catalogue Value (Observed)", "Catalogue Value Added (1× Listing)", "Projected Catalogue Value (Scenario)"],
+            "Value": [current_val, incremental_catalogue_val, projected_catalogue_val],
         })
         fig = px.bar(
-            chart_df, 
-            x='Metric', 
-            y='Amount', 
-            text_auto='.2s',
-            color='Metric', 
-            color_discrete_sequence=['#6c757d', '#28a745', '#007bff'],
-            title=f"Catalogue Inventory Expansion for {target_store_id}"
+            chart_df,
+            x="Stage",
+            y="Value",
+            text_auto=".3s",
+            color="Stage",
+            color_discrete_sequence=["#6c757d", "#28a745", "#007bff"],
+            title=f"Catalogue Value Comparison for {target_store_id} (Dataset Units)",
+            labels={"Value": "Recorded Sales Metric (Dataset Units)"},
         )
         fig.update_layout(showlegend=False, height=320, margin=dict(t=40, b=20, l=20, r=20))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
-    st.markdown(f"""
-    <div class="insight-box">
-        <b>💡 Executive Takeaway for Leadership:</b><br>
-        Expanding <b>{target_store_id}</b> by <b>{skus_to_add} SKUs</b> requires an initial working capital investment of 
-        <b>{symbol}{incremental_inventory_value:,.2f}</b>. At <b>{inventory_turns_per_year} annual turns</b> and a <b>{target_gross_margin*100:.1f}% margin</b>, 
-        this generates <b>{symbol}{annual_gross_profit:,.2f}</b> in gross profit against <b>{symbol}{annual_holding_cost:,.2f}</b> in holding costs, 
-        delivering a <b>net annual operating uplift of {symbol}{net_annual_operating_contribution:,.2f}</b>.
+    st.markdown(
+        f"""
+    <div class="warning-box">
+        <b>⚠️ Methodology & Limitations (Illustrative Scenario Only):</b><br>
+        • <b>Observed baseline:</b> <b>{target_store_id}</b> currently lists <b>{current_skus:,} SKUs</b> (summed Recorded Sales value = <b>{current_val:,.2f}</b>).<br>
+        • <b>Catalogue addition formula:</b> <code>{skus_to_add} SKUs × {sup_mean_sales:.2f} (Supermarket mean Recorded Sales value) = {incremental_catalogue_val:,.2f}</code>.<br>
+        • <b>Why this is NOT a financial forecast:</b> The source dataset contains no transaction quantities, customer demand, COGS, or holding-cost data.
+        The hypothetical gross sales (<b>{illustrative_gross_sales:,.2f}</b>) and gross margin (<b>{illustrative_gross_margin:,.2f}</b>) figures above depend entirely on your slider assumptions
+        and do not represent guaranteed revenue, working capital, or operating profit.
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
 # ==============================================================================
 # TAB 2: SALES VARIANCE DECOMPOSITION
 # ==============================================================================
 with tab2:
-    st.header("🔬 Variance Decomposition: What Does Sales Represent?")
+    st.header("🔬 Variance Decomposition: What Does the Recorded Sales Field Represent?")
 
-    # Variance decomposition calculation
-    grand_mean = df['Sales'].mean()
-    ss_total = ((df['Sales'] - grand_mean) ** 2).sum()
-    sku_means = df.groupby('Item Identifier')['Sales'].transform('mean')
-    ss_sku = ((sku_means - grand_mean) ** 2).sum()
-    r2_sku = ss_sku / ss_total
-
-    cat_means = df.groupby('Item Type')['Sales'].transform('mean')
-    ss_cat = ((cat_means - grand_mean) ** 2).sum()
-    r2_cat = ss_cat / ss_total
-
-    outlet_means = df.groupby('Outlet Identifier')['Sales'].transform('mean')
-    ss_outlet = ((outlet_means - grand_mean) ** 2).sum()
-    r2_outlet = ss_outlet / ss_total
+    grand_mean = df["Sales"].mean()
+    ss_total = ((df["Sales"] - grand_mean) ** 2).sum()
+    r2_sku = ((df.groupby("Item Identifier")["Sales"].transform("mean") - grand_mean) ** 2).sum() / ss_total if ss_total else 0.0
+    r2_cat = ((df.groupby("Item Type")["Sales"].transform("mean") - grand_mean) ** 2).sum() / ss_total if ss_total else 0.0
+    r2_outlet = ((df.groupby("Outlet Identifier")["Sales"].transform("mean") - grand_mean) ** 2).sum() / ss_total if ss_total else 0.0
 
     st.markdown(
-        "`Sales` behaves like a per-item price rather than consumer revenue volume: "
-        f"**{r2_sku * 100:.2f}% of its variance is explained by `Item Identifier` alone**. "
-        "This supports a price-like interpretation, but does not establish that the column is MRP. "
-        "The source does not specify the currency, so values are shown in original dataset units."
+        f"`Sales` behaves like a SKU-level unit price rather than store-level demand volume: "
+        f"**{r2_sku * 100:.2f}% of its variance is explained by `Item Identifier` alone** ($R^2 = {r2_sku:.4f}$). "
+        f"Currency is not specified in the source dataset, so values are displayed in original dataset units."
     )
 
-    v_col1, v_col2 = st.columns([1, 1])
-
+    v_col1, v_col2 = st.columns(2)
     with v_col1:
-        st.subheader("Variance Decomposition ($R^2$)")
         decomp_df = pd.DataFrame({
-            'Factor': ['Item Identifier (SKU)', 'Category (Item Type)', 'Outlet Identifier (Store)'],
-            'Variance Explained (%)': [r2_sku * 100, r2_cat * 100, r2_outlet * 100],
-            'R_Squared': [r2_sku, r2_cat, r2_outlet]
+            "Factor": ["Item Identifier (SKU)", "Category (Item Type)", "Outlet Identifier (Store)"],
+            "Variance Explained (%)": [r2_sku * 100, r2_cat * 100, r2_outlet * 100],
         })
         fig_decomp = px.bar(
-            decomp_df, 
-            x='Factor', 
-            y='Variance Explained (%)', 
-            text=decomp_df['Variance Explained (%)'].apply(lambda x: f"{x:.2f}%"),
-            color='Factor',
-            color_discrete_sequence=['#0066cc', '#6c757d', '#dc3545'],
-            title="Proportion of Sales Variance Explained by Factor"
+            decomp_df,
+            x="Factor",
+            y="Variance Explained (%)",
+            text=decomp_df["Variance Explained (%)"].apply(lambda x: f"{x:.2f}%"),
+            color="Factor",
+            color_discrete_sequence=["#0066cc", "#6c757d", "#dc3545"],
+            title="Proportion of Recorded Sales Variance Explained (R²)",
         )
         fig_decomp.update_layout(showlegend=False, height=350)
-        st.plotly_chart(fig_decomp, use_container_width=True)
+        st.plotly_chart(fig_decomp, width="stretch")
 
     with v_col2:
-        st.subheader("SKU-Level Consistency Inspector")
-        sample_skus = df['Item Identifier'].value_counts().head(10).index.tolist()
-        selected_sku = st.selectbox("Inspect SKU Sales Value across Stores", sample_skus)
-        sku_records = df[df['Item Identifier'] == selected_sku][['Outlet Identifier', 'Outlet Type', 'Sales']]
-        sku_records['Sales'] = sku_records['Sales'] * rate
-
+        sample_skus = df["Item Identifier"].value_counts().head(10).index.tolist()
+        selected_sku = st.selectbox("Inspect SKU Recorded Sales Value across Outlets", sample_skus)
+        sku_records = df[df["Item Identifier"] == selected_sku][["Outlet Identifier", "Outlet Type", "Sales"]].copy()
         fig_sku = px.scatter(
-            sku_records, 
-            x='Outlet Identifier', 
-            y='Sales', 
-            color='Outlet Type',
-            size=[14]*len(sku_records),
-            title=f"Sales Value by Outlet for SKU: {selected_sku}",
-            labels={'Sales': 'Sales value (dataset units)'}
+            sku_records,
+            x="Outlet Identifier",
+            y="Sales",
+            color="Outlet Type",
+            size=[14] * len(sku_records),
+            title=f"Recorded Sales Value by Outlet for SKU: {selected_sku}",
+            labels={"Sales": "Recorded Sales Value (Dataset Units)"},
         )
         fig_sku.update_layout(height=350)
-        st.plotly_chart(fig_sku, use_container_width=True)
+        st.plotly_chart(fig_sku, width="stretch")
 
-    st.markdown(f"""
-    <div class="warning-box">
-        <b>What this means:</b> The average within-SKU standard deviation is only <b>{symbol}{df.groupby('Item Identifier')['Sales'].std().mean()*rate:.2f}</b>, 
-        compared with <b>{symbol}{df['Sales'].std()*rate:.2f}</b> overall. 
-        The same SKUs recur across outlets and the dataset has no units-sold field, so store totals largely track 
-        <b>which SKUs are listed (assortment breadth)</b> rather than purchasing velocity.
+    st.markdown(
+        f"""
+    <div class="insight-box">
+        <b>Key Takeaway:</b> The average within-SKU standard deviation is only <b>{within_sku_sd:.2f}</b> vs <b>{df['Sales'].std():.2f}</b> overall.
+        Store-level sums of `Sales` therefore track <b>catalogue breadth (number of SKUs listed)</b> rather than realized unit volume.
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
 # ==============================================================================
-# TAB 3: SIMPSON'S PARADOX & TIER 2 AUDIT
+# TAB 3: STORE-FORMAT COMPOSITION AUDIT (SIMPSON'S PARADOX)
 # ==============================================================================
 with tab3:
-    st.header("⚖️ Debunking the 'Tier 2 Outperformance Myth': Simpson's Paradox")
+    st.header("⚖️ Store-Format Composition Audit (Simpson's Paradox)")
     st.markdown(
-        "A naive aggregation suggests Tier 2 locations outperform Tier 1 and Tier 3 in average store sales. "
-        "However, this is an illusion caused by **confounding by store format (Simpson's Paradox)**."
+        "A naive tier-level average suggests Tier 2 outlets have higher per-store catalogue values than Tier 1 and Tier 3. "
+        "Controlling for store format shows this is an artifact of **outlet composition**."
     )
 
-    simpson_mode = st.radio(
-        "Analytical View", 
-        ["Naive Aggregated View (Confounded)", "Format-Controlled View (Debunked)"], 
-        horizontal=True
-    )
+    simpson_mode = st.radio("Analytical View", ["Naive Aggregated View (Confounded)", "Format-Controlled View (Supermarkets Only)"], horizontal=True)
 
     if simpson_mode == "Naive Aggregated View (Confounded)":
-        naive_df = df.groupby('Outlet Location Type')['Sales'].agg(['count', 'sum']).reset_index()
-        stores_per_tier = df.groupby('Outlet Location Type')['Outlet Identifier'].nunique().reset_index()
-        naive_df = naive_df.merge(stores_per_tier, on='Outlet Location Type')
-        naive_df['Revenue_Per_Store'] = (naive_df['sum'] / naive_df['Outlet Identifier']) * rate
-
+        naive_df = df.groupby("Outlet Location Type").agg(Catalogue_Sum=("Sales", "sum"), Stores=("Outlet Identifier", "nunique")).reset_index()
+        naive_df["Catalogue_Value_Per_Store"] = naive_df["Catalogue_Sum"] / naive_df["Stores"]
         fig_naive = px.bar(
-            naive_df, 
-            x='Outlet Location Type', 
-            y='Revenue_Per_Store',
-            text=naive_df['Revenue_Per_Store'].apply(lambda x: f"{symbol}{x:,.0f}"),
-            color='Outlet Location Type',
-            color_discrete_sequence=['#dc3545', '#28a745', '#ffc107'],
-            title="Naive Average Store Revenue by Location Tier (Misleading)"
+            naive_df,
+            x="Outlet Location Type",
+            y="Catalogue_Value_Per_Store",
+            text=naive_df["Catalogue_Value_Per_Store"].apply(lambda x: f"{x:,.0f}"),
+            color="Outlet Location Type",
+            color_discrete_sequence=["#dc3545", "#28a745", "#ffc107"],
+            title="Naive Average Catalogue Value per Store by Tier (Confounded)",
+            labels={"Catalogue_Value_Per_Store": "Catalogue Value per Store (Dataset Units)"},
         )
         fig_naive.update_layout(height=400, showlegend=False)
-        st.plotly_chart(fig_naive, use_container_width=True)
-        st.error("⚠️ Flawed Conclusion: 'Tier 2 cities are fundamentally more lucrative markets for Blinkit.'")
+        st.plotly_chart(fig_naive, width="stretch")
+        st.warning("⚠️ Confounded view: Tier 2 appears higher only because it contains zero Grocery Stores.")
     else:
-        controlled_df = df[df['Outlet Type'] != 'Grocery Store'].groupby('Outlet Location Type')['Sales'].agg(['sum']).reset_index()
-        sm_stores = df[df['Outlet Type'] != 'Grocery Store'].groupby('Outlet Location Type')['Outlet Identifier'].nunique().reset_index()
-        controlled_df = controlled_df.merge(sm_stores, on='Outlet Location Type')
-        controlled_df['Revenue_Per_Supermarket'] = (controlled_df['sum'] / controlled_df['Outlet Identifier']) * rate
-
-        fig_controlled = px.bar(
-            controlled_df, 
-            x='Outlet Location Type', 
-            y='Revenue_Per_Supermarket',
-            text=controlled_df['Revenue_Per_Supermarket'].apply(lambda x: f"{symbol}{x:,.0f}"),
-            color='Outlet Location Type',
-            color_discrete_sequence=['#007bff', '#007bff', '#007bff'],
-            title="Supermarkets-Only Revenue Per Store (Format Controlled)"
+        ctrl_df = (
+            df[df["Outlet Type"] != "Grocery Store"]
+            .groupby("Outlet Location Type")
+            .agg(Catalogue_Sum=("Sales", "sum"), Stores=("Outlet Identifier", "nunique"))
+            .reset_index()
         )
-        fig_controlled.update_layout(height=400, showlegend=False)
-        st.plotly_chart(fig_controlled, use_container_width=True)
-        rev_vals = controlled_df['Revenue_Per_Supermarket']
-        spread_pct = (rev_vals.max() - rev_vals.min()) / rev_vals.mean() * 100
+        ctrl_df["Catalogue_Value_Per_Supermarket"] = ctrl_df["Catalogue_Sum"] / ctrl_df["Stores"]
+        fig_ctrl = px.bar(
+            ctrl_df,
+            x="Outlet Location Type",
+            y="Catalogue_Value_Per_Supermarket",
+            text=ctrl_df["Catalogue_Value_Per_Supermarket"].apply(lambda x: f"{x:,.0f}"),
+            color="Outlet Location Type",
+            color_discrete_sequence=["#007bff", "#007bff", "#007bff"],
+            title="Supermarkets-Only Catalogue Value per Store (Format-Controlled)",
+            labels={"Catalogue_Value_Per_Supermarket": "Catalogue Value per Supermarket (Dataset Units)"},
+        )
+        fig_ctrl.update_layout(height=400, showlegend=False)
+        st.plotly_chart(fig_ctrl, width="stretch")
+        vals = ctrl_df["Catalogue_Value_Per_Supermarket"]
+        spread_pct = ((vals.max() - vals.min()) / vals.mean() * 100.0) if vals.mean() > 0 else 0.0
         st.success(
-            f"✅ Format-controlled view: average Sales total per supermarket ranges from {rev_vals.min():,.0f} "
-            f"to {rev_vals.max():,.0f} across location tiers (a spread of {spread_pct:.1f}% of the mean). "
-            "These are descriptive totals, not a significance test."
+            f"✅ Format-controlled view: average Supermarket catalogue value ranges from {vals.min():,.0f} to {vals.max():,.0f} "
+            f"across tiers (spread = {spread_pct:.2f}% of mean). Descriptive comparison only; not a significance test."
         )
-
-    st.markdown("""
-    <div class="insight-box">
-        <b>Why this happened:</b> Tier 2 contains <b>zero Grocery Stores</b> (3 Supermarkets only), while Tier 1 contains 1 Grocery Store (OUT019) 
-        and Tier 3 contains 1 Grocery Store (OUT010). Because Grocery Stores carry only ~541 SKUs (vs ~930 in Supermarkets), 
-        their inclusion dragged down Tier 1 and Tier 3 averages. <b>The gap reflects store composition (listing counts), not evidence of demand differences between tiers.</b>
-    </div>
-    """, unsafe_allow_html=True)
 
 # ==============================================================================
-# TAB 4: SKU RECOMMENDATION ENGINE
+# TAB 4: MISSING-SKU EXPLORER
 # ==============================================================================
 with tab4:
-    st.header("🎯 Grocery Store Assortment Recommender")
+    st.header("🎯 Grocery Store Missing-SKU Candidate Explorer")
     st.markdown(
-        "Ranked list of SKUs stocked across all Supermarkets but missing in Grocery Stores (`OUT010` & `OUT019`). "
-        "Use these priority scores to guide merchant catalogue onboarding."
+        "SKUs stocked in 1 to 8 Supermarkets that are absent from both Grocery Stores (`OUT010`, `OUT019`). "
+        "Priority score (`supermarket_presence × mean_sales_value`) is an illustrative catalogue-screening heuristic, not a demand ranking."
     )
 
-    query_missing = """
-    SELECT 
-        item_identifier,
-        item_type,
-        product_family,
-        item_fat_content,
-        supermarket_presence,
-        mean_mrp,
-        avg_rating,
-        expansion_priority_score
-    FROM vw_missing_sku_prioritization
-    """
-    missing_df = pd.read_sql_query(query_missing, conn)
-    missing_df['mean_mrp'] = missing_df['mean_mrp'] * rate
-
+    missing_df = pd.read_sql_query("SELECT * FROM vw_missing_sku_prioritization", conn)
     rec_col1, rec_col2 = st.columns([1, 2])
-
     with rec_col1:
-        sel_family = st.multiselect("Filter Family", missing_df['product_family'].unique(), default=missing_df['product_family'].unique())
-        sel_cat = st.multiselect("Filter Category", missing_df['item_type'].unique(), default=['Fruits and Vegetables', 'Snack Foods', 'Frozen Foods'])
+        all_families = sorted(missing_df["product_family"].unique().tolist())
+        all_cats = sorted(missing_df["item_type"].unique().tolist())
+        default_cats = [c for c in ["Fruits and Vegetables", "Snack Foods", "Frozen Foods"] if c in all_cats] or all_cats[:3]
+        sel_family = st.multiselect("Filter Product Family", all_families, default=all_families)
+        sel_cat = st.multiselect("Filter Category", all_cats, default=default_cats)
         min_pres = st.slider("Minimum Supermarket Presence (Stores)", 1, 8, 7)
 
     filtered_missing = missing_df[
-        (missing_df['product_family'].isin(sel_family)) &
-        (missing_df['item_type'].isin(sel_cat)) &
-        (missing_df['supermarket_presence'] >= min_pres)
+        (missing_df["product_family"].isin(sel_family))
+        & (missing_df["item_type"].isin(sel_cat))
+        & (missing_df["supermarket_presence"] >= min_pres)
     ]
 
     with rec_col2:
-        fig_scatter = px.scatter(
-            filtered_missing,
-            x='mean_mrp',
-            y='expansion_priority_score',
-            color='item_type',
-            size='supermarket_presence',
-            hover_data=['item_identifier', 'avg_rating'],
-            title="Expansion Priority Score vs. Mean Sales Value",
-            labels={'mean_mrp': 'Mean Sales value (dataset units)', 'expansion_priority_score': 'Priority Score'}
-        )
-        fig_scatter.update_layout(height=380)
-        st.plotly_chart(fig_scatter, use_container_width=True)
+        if filtered_missing.empty:
+            st.info("No candidate SKUs match the current filter selection. Broaden your filters to inspect candidates.")
+        else:
+            fig_scatter = px.scatter(
+                filtered_missing,
+                x="mean_sales_value",
+                y="expansion_priority_score",
+                color="item_type",
+                size="supermarket_presence",
+                hover_data=["item_identifier", "avg_rating"],
+                title="Heuristic Priority Score vs. Mean Recorded Sales Value",
+                labels={"mean_sales_value": "Mean Recorded Sales Value (Dataset Units)", "expansion_priority_score": "Heuristic Priority Score"},
+            )
+            fig_scatter.update_layout(height=380)
+            st.plotly_chart(fig_scatter, width="stretch")
 
-    st.subheader(f"Recommended Onboarding Queue ({len(filtered_missing)} Candidate SKUs)")
+    st.subheader(f"Candidate SKU Queue ({len(filtered_missing)} SKUs)")
     st.dataframe(
-        filtered_missing.style.format({
-            'mean_mrp': '{:,.2f}',
-            'expansion_priority_score': '{:,.2f}',
-            'avg_rating': '{:.2f}'
-        }),
-        use_container_width=True
+        filtered_missing.style.format({"mean_sales_value": "{:,.2f}", "expansion_priority_score": "{:,.2f}", "avg_rating": "{:.2f}"}),
+        width="stretch",
     )
-
-    csv_export = filtered_missing.to_csv(index=False).encode('utf-8')
     st.download_button(
         label="📥 Export Candidate SKUs to CSV",
-        data=csv_export,
-        file_name='blinkit_recommended_expansion_skus.csv',
-        mime='text/csv'
+        data=filtered_missing.to_csv(index=False).encode("utf-8"),
+        file_name="blinkit_missing_sku_candidates.csv",
+        mime="text/csv",
     )
 
 # ==============================================================================
-# TAB 5: SQL STAR SCHEMA EXPLORER
+# TAB 5: READ-ONLY SQL STAR SCHEMA EXPLORER
 # ==============================================================================
 with tab5:
-    st.header("🗄️ SQL Analytics Warehouse & View Inspector")
+    st.header("🗄️ Read-Only SQL Star Schema Explorer")
     st.markdown(
-        "The underlying analytical layer is backed by a relational SQLite/ANSI Star Schema (`blinkit_warehouse.db`). "
-        "Select any analytical view below to inspect the live SQL results directly."
+        "Connected strictly in **read-only mode** (`mode=ro`) to `blinkit_warehouse.db`. "
+        "Inspect pre-built analytical views or run validated single-statement `SELECT`/`WITH` queries."
     )
 
-    view_choice = st.selectbox(
-        "Select Analytical Warehouse View",
-        [
-            "vw_outlet_assortment_gap", 
-            "vw_format_controlled_tiers", 
-            "vw_category_pareto", 
-            "vw_missing_sku_prioritization",
-            "vw_sku_pricing_variance"
-        ]
-    )
-
+    ALLOWED_VIEWS = [
+        "vw_outlet_assortment_gap",
+        "vw_format_controlled_tiers",
+        "vw_category_pareto",
+        "vw_missing_sku_prioritization",
+        "vw_sku_pricing_variance",
+    ]
+    view_choice = st.selectbox("Select Analytical Warehouse View", ALLOWED_VIEWS)
     limit_rows = st.slider("Row Limit", 5, 50, 15)
-    view_data = pd.read_sql_query(f"SELECT * FROM {view_choice} LIMIT {limit_rows}", conn)
-    st.dataframe(view_data, use_container_width=True)
+    # View name validated against fixed allowlist; limit passed as SQL parameter
+    view_data = pd.read_sql_query(f"SELECT * FROM {view_choice} LIMIT ?", conn, params=(int(limit_rows),))
+    st.dataframe(view_data, width="stretch")
 
-    st.subheader("Interactive Custom SQL Query")
+    st.subheader("Read-Only Custom SQL Query")
     custom_sql = st.text_area(
-        "Write SQL query against `fact_inventory_pricing`, `dim_products`, `dim_outlets`:",
-        value="SELECT p.item_type, COUNT(f.fact_key) AS listings, ROUND(AVG(f.sales_mrp), 2) AS avg_mrp FROM fact_inventory_pricing f JOIN dim_products p ON f.product_key = p.product_key GROUP BY p.item_type ORDER BY avg_mrp DESC LIMIT 5;"
+        "Enter a single SELECT or WITH query against `fact_inventory_pricing`, `dim_products`, `dim_outlets`:",
+        value="SELECT p.item_type, COUNT(f.fact_key) AS listings, ROUND(AVG(f.sales_mrp), 2) AS mean_sales_value FROM fact_inventory_pricing f JOIN dim_products p ON f.product_key = p.product_key GROUP BY p.item_type ORDER BY mean_sales_value DESC LIMIT 5;",
     )
+    if st.button("Execute Read-Only Query"):
+        ok, result = validate_readonly_sql(custom_sql)
+        if not ok:
+            st.error(f"Query rejected: {result}")
+        else:
+            try:
+                sql_res = pd.read_sql_query(result, conn)
+                st.dataframe(sql_res, width="stretch")
+                st.success(f"Query returned {len(sql_res)} rows.")
+            except Exception as exc:
+                st.error(f"SQL Error: {exc}")
 
-    if st.button("Execute SQL Query"):
-        try:
-            sql_res = pd.read_sql_query(custom_sql, conn)
-            st.dataframe(sql_res, use_container_width=True)
-            st.success(f"Query returned {len(sql_res)} rows.")
-        except Exception as e:
-            st.error(f"SQL Error: {e}")
-
-# ------------------------------------------------------------------------------
-# FOOTER
-# ------------------------------------------------------------------------------
 st.markdown("---")
-st.caption(
-    "Blinkit Quick-Commerce Analytics Engineering Suite · Portfolio Flagship Project 1 · "
-    "Designed for Senior Data Analyst / Junior Data Scientist Interview Evaluation"
-)
+st.caption("BlinkIT Grocery Catalogue Analysis · Portfolio Project · Currency unspecified (original dataset units)")

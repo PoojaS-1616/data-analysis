@@ -1,167 +1,43 @@
-# 🛒 Blinkit Grocery Pricing & Catalogue Analysis
+# 🛒 BlinkIT Grocery Pricing & Catalogue Architecture Analysis
 
 ![Project](https://img.shields.io/badge/Project-Data%20Analytics-orange?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-Analysis-blue?style=for-the-badge&logo=python)
-![Power BI](https://img.shields.io/badge/Power%20BI-Visualization-yellow?style=for-the-badge&logo=powerbi)
-![Status](https://img.shields.io/badge/Status-Completed-success?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue?style=for-the-badge&logo=python)
+![SQLite](https://img.shields.io/badge/SQL-Star%20Schema-003B57?style=for-the-badge&logo=sqlite)
+![Streamlit](https://img.shields.io/badge/Streamlit-Interactive%20App-FF4B4B?style=for-the-badge&logo=streamlit)
 
-**An end-to-end data analytics project exploring grocery product pricing, catalogue distribution, outlet assortment, and customer ratings using Blinkit product and outlet data.**
+**An end-to-end Python, SQL (SQLite Star Schema), and Streamlit analytics project examining product pricing structure, store-format assortment breadth, Simpson's Paradox confounding, and SKU-level variance decomposition across 8,523 product-outlet catalogue records.**
 
-> Explore the data, understand the key business metrics, and uncover insights into product assortment and pricing patterns.
-
----
-
-## 📌 Table of Contents
-
-- [📊 Project Overview](#-project-overview)
-- [🎯 Business Objectives](#-business-objectives)
-- [📈 Key Performance Indicators](#-key-performance-indicators)
-- [🔍 Key Insights](#-key-insights)
-- [📊 Data Visualizations](#-data-visualizations)
-- [🧰 Tools and Technologies](#-tools-and-technologies)
-- [🗂️ Project Structure](#️-project-structure)
-- [⚙️ Analytical Approach](#️-analytical-approach)
-- [⚠️ Data Limitations](#️-data-limitations)
-- [💡 Recommendations](#-recommendations)
-- [🚀 How to Explore](#-how-to-explore)
-- [👩‍💻 Author](#-author)
+> **Transparency & Units Notice:** Currency units are **not specified** in the source dataset, so all values are reported in original dataset units without currency conversion. Variance decomposition ($R^2 = 99.97\%$) demonstrates that the `Sales` field behaves like a **SKU-level unit price / catalogue value**, not verified transaction revenue. See [Data Provenance & Limitations](#-data-provenance--limitations) below.
 
 ---
 
-## 📊 Project Overview
+## 🖥️ Live Streamlit Dashboard Preview
 
-This project analyzes a Blinkit grocery catalogue dataset containing product and outlet-level records. The objective is to understand pricing patterns, category distribution, outlet assortment, and product ratings through data cleaning, exploratory data analysis, SQL-based data organization, and dashboard reporting.
+![BlinkIT Catalogue Pricing & Assortment Explorer](./dashboard_live_screenshot.png)
 
-The project demonstrates how raw retail catalogue data can be transformed into structured datasets and actionable business insights.
+---
 
-### Dataset at a glance
+## 📊 Dataset at a Glance
 
-| Metric | Value |
+| Metric | Verified Value |
 |---|---:|
-| Product-outlet records | 8,523 |
-| Unique SKUs | 1,559 |
-| Outlets | 10 |
-| Product categories | 16 |
-| Average Sales value | 140.99 |
-| Average Rating | 3.97 / 5 |
+| Product-outlet records | `8,523` (`0` nulls, `0` duplicates) |
+| Unique SKUs (`Item Identifier`) | `1,559` |
+| Outlets (`Outlet Identifier`) | `10` (`8` Supermarkets · `2` Grocery Stores) |
+| Product categories (`Item Type`) | `16` |
+| Sum of Recorded `Sales` Metric | `1,201,681.49` *(dataset units)* |
+| Mean / Median Recorded `Sales` Value | `140.99` / `143.01` *(min `31.29`, max `266.89`, SD `62.28`)* |
+| Average Rating | `3.97 / 5` (`39.18%` rated exactly `4.0`) |
 
 ---
 
-## 🎯 Business Objectives
+## 🔍 Key Analytical Findings
 
-- Analyze product pricing and sales-value distributions.
-- Understand product assortment across outlets.
-- Identify categories contributing the largest share of the recorded Sales metric.
-- Examine customer rating patterns.
-- Compare catalogue breadth across outlet types.
-- Build a reusable analytical workflow and interactive reporting experience.
-
----
-
-## 📈 Key Performance Indicators
-
-| KPI | Result |
-|---|---:|
-| Total recorded Sales | 1,201,681.49 |
-| Average recorded Sales | 140.99 |
-| Median recorded Sales | 143.01 |
-| Minimum recorded Sales | 31.29 |
-| Maximum recorded Sales | 266.89 |
-| Standard deviation | 62.28 |
-| Average rating | 3.97 |
-| Records rated exactly 4 | 39.18% |
-
-*Note: Currency units are not specified here. The Sales field behaves strongly like a product-level price or value rather than verified transaction revenue.*
-
----
-
-## 🔍 Key Insights
-
-### 1. Product and SKU patterns
-
-The dataset contains 8,523 product-outlet records across 1,559 unique SKUs and 10 outlets. This supports comparisons of catalogue coverage and recorded product values.
-
-### 2. Category concentration
-
-The five largest categories account for approximately **59.03% of the summed Sales metric**.
-
-This indicates that a substantial share of the recorded value is concentrated in a subset of categories.
-
-### 3. Outlet assortment
-
-| Outlet type | Average SKUs |
-|---|---:|
-| Supermarkets | 930 |
-| Grocery Stores | 541.5 |
-
-Supermarkets have a broader average assortment than grocery stores in this dataset.
-
-### 4. Customer ratings
-
-- Average rating: **3.97 out of 5**
-- Records with a rating of exactly 4: **39.18%**
-
-These metrics describe the rating distribution in the available records; they do not establish customer satisfaction drivers or sales impact.
-
-### 5. Sales metric interpretation
-
-SKU identity explains approximately **99.97% of the variance** in the recorded Sales field (R² = 0.9997).
-
-This suggests the field may represent product pricing or another SKU-linked value. Its exact business meaning should be confirmed against the original data source before treating it as realized revenue.
-
----
-
-## 📊 Data Visualizations
-
-The following charts use the aggregate metrics available in this project summary. They are illustrative comparisons, not substitutes for charts built from the full dataset.
-
-### Average catalogue assortment by outlet type
-
-```mermaid
-xychart-beta
-    title "Average SKUs by Outlet Type"
-    x-axis ["Supermarkets", "Grocery Stores"]
-    y-axis "Average SKUs" 0 --> 1000
-    bar [930, 541.5]
-```
-
-### Recorded Sales value distribution
-
-```mermaid
-xychart-beta
-    title "Sales Value Summary"
-    x-axis ["Minimum", "Median", "Average", "Maximum"]
-    y-axis "Recorded Value" 0 --> 300
-    bar [31.29, 143.01, 140.99, 266.89]
-```
-
-### Category concentration
-
-The top five categories account for **59.03%** of the summed Sales metric, with the remaining categories accounting for approximately **40.97%**.
-
-```mermaid
-pie showData
-    title Share of Recorded Sales Metric
-    "Top 5 categories" : 59.03
-    "Remaining categories" : 40.97
-```
-
----
-
-## 🧰 Tools and Technologies
-
-| Tool | Purpose |
-|---|---|
-| Python | Data cleaning and analysis |
-| Pandas | Data manipulation |
-| NumPy | Numerical calculations |
-| Matplotlib / Seaborn | Data visualization, where used |
-| SQL / SQLite | Structured storage and querying |
-| Streamlit | Interactive dashboard |
-| Jupyter Notebook | Exploratory analysis |
-| GitHub | Project documentation and version control |
-
-*The tools listed should match the libraries and applications actually used in the project.*
+1. **Variance Decomposition — `Sales` Is SKU-Driven ($R^2 = 99.97\%$):** One-way ANOVA decomposition shows `Item Identifier` alone explains **99.97%** of the variance in `Sales` (Adjusted $R^2 = 0.9996$; average within-SKU SD = `1.15` vs `62.28` overall; max cross-store spread = `4.00`). Outlet identity explains only `0.03%`. Store-level sums of `Sales` therefore track **assortment breadth (SKU count)** rather than demand velocity.
+2. **Store-Format Composition Audit (Simpson's Paradox):** Naive tier averages make Tier 2 (`131,050` per store) appear ahead of Tier 1 (`112,133`) and Tier 3 (`118,033`). Controlling for store format (Supermarkets only) collapses the tier spread to **0.2%** (`Tier 1: 131,295`, `Tier 2: 131,050`, `Tier 3: 131,334`). The naive gap is purely a **composition effect**—Tier 2 contains zero Grocery Stores, whereas Tier 1 (`OUT019`) and Tier 3 (`OUT010`) each contain one.
+3. **Outlet Assortment Breadth Gap:** Supermarkets average **930.0 SKUs** vs **541.5 SKUs** in Grocery Stores (a **388.5 SKU/store** gap). Using the Supermarket mean Recorded Sales value (`141.09`), closing this listing gap across both Grocery Stores corresponds to a hypothetical catalogue-value addition of **+109,630.35 units (+9.12%)**—an illustrative catalogue scenario, **not** a revenue forecast.
+4. **Category Concentration (Pareto):** The top 5 of 16 categories (`Fruits and Vegetables`, `Snack Foods`, `Household`, `Frozen Foods`, `Dairy`) account for **59.03%** (`709,369.87`) of the summed Recorded Sales metric, closely mirroring their **57.26%** listing-count share.
+5. **Data Quality Engineering:** Imputed `1,463` missing `Item Weight` values via SKU mean (constant per SKU) with category-median fallback for 4 all-null SKUs; imputed `526` zero `Item Visibility` entries; harmonized `Item Fat Content` into `Low Fat`, `Regular`, and `Non-Edible`; and flagged 3 outlets with contradictory raw `Outlet Size` labels (`OUT010`, `OUT017`, `OUT045`) as `Unknown` while preserving `Outlet Size (Original)`.
 
 ---
 
@@ -169,99 +45,75 @@ pie showData
 
 ```text
 BlinkIT-Grocery-Sales-Analysis/
-│
-├── app.py
-│   └── Interactive Streamlit Executive Assortment Simulator & Decision Suite
-│
-├── blinkit_warehouse.sql
-│   └── SQLite Dimensional Warehouse Schema with 5 Analytical Views
-│       (DDL + 5 Analytical Views)
-│
-├── build_warehouse.py
-│   └── Automated SQLite ETL Pipeline & Query Verification Engine
-│
-├── BlinkIT_Grocery_Sales_Analysis.ipynb
-│   └── Main Jupyter Analysis Notebook (4 Objectives & 16 Tasks)
-│
-├── BlinkIT_Grocery_Sales_Analysis_v2.ipynb
-│   └── Extended Interactive Visualizations Notebook
-│
-├── BlinkIT_Grocery_Data_Cleaned.csv
-│   └── Standardized Cleaned Dataset (8,523 Rows × 15 Columns, 0 Nulls)
-│
-├── Blinkit Grocery Data.xlsx
-│   └── Primary Raw Dataset
-│
-├── README.md
-│   └── Project Documentation & Executive Summary
-│
-├── requirements.txt
-│   └── Project Dependencies
-│
-├── run_analysis.py
-│   └── Automated Standalone Execution Pipeline
-│
-├── dashboard_live_screenshot.png
-│   └── Live Streamlit Dashboard Interface Screenshot
-│
-└── visuals/
-    └── 10 High-Resolution Exported Figures (13 Visualization Panels)
+├── app.py                                   # Interactive 5-tab Streamlit app (read-only SQLite + scenario explorer)
+├── blinkit_warehouse.sql                    # SQLite Star Schema DDL (UNIQUE grain, FK enforcement) + 5 analytical views
+├── build_warehouse.py                       # CWD-independent, repeatable SQLite ETL builder & view verifier
+├── run_analysis.py                          # Standalone cleaning, statistical testing & 10-chart export pipeline
+├── BlinkIT_Grocery_Sales_Analysis_v2.ipynb  # Canonical Jupyter analysis notebook (33 code cells, verified clean run)
+├── dashboard_live_screenshot.png            # Current live Streamlit application screenshot
+├── requirements.txt                         # Python dependencies
+├── REMEDIATION_CHANGELOG.md                 # Full post-audit engineering changelog
+├── .gitignore                               # Excludes restricted datasets (*.xlsx/*.csv), local *.db, caches
+└── visuals/                                 # 12 unique high-resolution figures (10 pipeline + 2 cohort decomposition)
 ```
 
----
-
-## ⚙️ Analytical Approach
-
-1. **Data understanding** — reviewed the available product, outlet, category, pricing, and rating fields.
-2. **Data preparation** — cleaned and organized the dataset for analysis.
-3. **Exploratory data analysis** — examined summary statistics, value distributions, and category patterns.
-4. **Outlet comparison** — compared catalogue assortment across outlet types.
-5. **SQL organization** — structured the data for reusable queries and analytical access.
-6. **Dashboard development** — prepared an interactive reporting experience for exploring key metrics.
-7. **Business interpretation** — translated the results into findings while documenting data limitations.
+> **Note on excluded data files:** `BlinkIT Grocery Data.xlsx` and `BlinkIT_Grocery_Data_Cleaned.csv` are excluded via `.gitignore` and are **not redistributed** in this repository. Place your locally obtained workbook in `BlinkIT-Grocery-Sales-Analysis/` before running the pipeline (see setup steps below).
 
 ---
 
-## ⚠️ Data Limitations
+## 🗄️ SQL Star Schema & Analytical Views (`blinkit_warehouse.sql`)
 
-- The dataset contains product-outlet records, not verified transaction-level sales.
-- Transaction quantities and timestamps are not available in the described dataset.
-- Actual units sold, revenue over time, demand trends, and seasonality cannot be established from these fields alone.
-- The Sales field requires validation against the original source before being interpreted as revenue.
-- Any catalogue-value opportunity estimate is a scenario, not confirmed incremental revenue, and should not be presented as a validated financial result.
-
----
-
-## 💡 Recommendations
-
-- **Review category concentration:** investigate the largest categories for assortment planning and catalogue management.
-- **Compare outlet assortment:** examine whether differences in catalogue breadth align with outlet formats and customer needs.
-- **Validate pricing fields:** confirm whether Sales represents price, item value, or another metric before calculating revenue.
-- **Improve rating analysis:** investigate rating distributions by category and outlet where the underlying data supports it.
-- **Add transaction data:** incorporate quantities, order dates, and realized prices to measure demand, revenue, and trends reliably.
-- **Monitor data quality:** check for missing values, duplicate records, and inconsistent product identifiers.
+- **Tables:** `dim_products` (`1,559` SKUs), `dim_outlets` (`10` outlets), `fact_inventory_pricing` (`8,523` rows, `UNIQUE(product_key, outlet_key)`, `PRAGMA foreign_keys = ON`).
+- **Views:**
+  1. `vw_sku_pricing_variance` — cross-store mean/min/max/spread of `sales_mrp` per SKU
+  2. `vw_outlet_assortment_gap` — store SKU counts, `total_catalogue_value`, and gap vs Supermarket benchmark
+  3. `vw_format_controlled_tiers` — `total_catalogue_value` and `catalogue_value_per_store` by Tier × Format
+  4. `vw_category_pareto` — `category_sales_metric`, `sales_metric_share_pct`, and cumulative Pareto curve
+  5. `vw_missing_sku_prioritization` — 658 SKUs stocked in 1–8 Supermarkets and absent from Grocery Stores
 
 ---
 
-## 🚀 How to Explore
+## 🚀 Reproducible Setup & Execution
 
-1. Browse the files in this project folder.
-2. Open the Jupyter Notebook to review the analysis.
-3. Inspect the cleaned dataset and SQL/SQLite files if included.
-4. Run the Streamlit dashboard if its application file and dependencies are available.
+Because the source dataset is **not redistributed** in this repository, obtain the dataset through its authorized source first:
+
+1. **Obtain the source dataset:** Download the **BigMart Sales** practice dataset through your authorized Analytics Vidhya DataHack account (under Analytics Vidhya's platform terms of use), or place your locally obtained `BlinkIT Grocery Data.xlsx` (or `BlinkIT_Grocery_Data.xlsx`) workbook into `BlinkIT-Grocery-Sales-Analysis/`.
+2. **Install dependencies:**
+   ```bash
+   pip install -r BlinkIT-Grocery-Sales-Analysis/requirements.txt
+   ```
+3. **Generate the cleaned CSV (`BlinkIT_Grocery_Data_Cleaned.csv`) and 10 core visuals locally:**
+   ```bash
+   python BlinkIT-Grocery-Sales-Analysis/run_analysis.py
+   ```
+4. **Build & verify the SQLite Star Schema warehouse (`blinkit_warehouse.db`):**
+   ```bash
+   python BlinkIT-Grocery-Sales-Analysis/build_warehouse.py
+   ```
+5. **Launch the interactive Streamlit dashboard (auto-builds DB if missing; connects read-only):**
+   ```bash
+   streamlit run BlinkIT-Grocery-Sales-Analysis/app.py
+   ```
+
+---
+
+## ⚠️ Data Provenance & Limitations
+
+- **Attribution & Non-Redistribution:** Forensic inspection indicates the source workbook (`8,523` rows, `1,559` SKUs, `OUT010`–`OUT049`, `Item_MRP` range `31.29–266.89`) is derived from the **Analytics Vidhya BigMart Sales** practice dataset. Analytics Vidhya classifies this dataset as proprietary and restricts public third-party redistribution; accordingly, **neither the source workbook nor the derived cleaned CSV is redistributed in this repository**, and no open license is claimed.
+- **No Transaction Volume or Timestamps:** The dataset has no units-sold column, no transaction dates, and no COGS. Actual revenue, demand elasticity, seasonality, and gross profit cannot be established from these records alone.
+- **Hypothetical Scenarios:** The Tab 1 scenario calculator in `app.py` separates observed catalogue listings from user-controlled velocity/margin sliders and is strictly illustrative.
+
+---
+
+## 🧰 Tools & Technologies
+
+- **Python (`pandas`, `numpy`, `scipy`, `matplotlib`, `seaborn`, `openpyxl`)** — data cleaning, variance decomposition, hypothesis testing, static visual pipeline
+- **SQL / SQLite** — Star Schema dimensional modeling, window-function Pareto views, FK/UNIQUE integrity
+- **Streamlit & Plotly** — interactive 5-tab decision-support explorer with read-only SQL sandbox
+- **Jupyter Notebook** — canonical end-to-end analytical narrative (`BlinkIT_Grocery_Sales_Analysis_v2.ipynb`)
 
 ---
 
 ## 👩‍💻 Author
 
-**Pooja Singh**
-
-Data Analytics Portfolio Project
-
-[GitHub Profile](https://github.com/PoojaS-1616)
-
----
-
-⭐ If you find this project useful, feel free to explore the repository and share feedback.
-
-*Built to demonstrate data cleaning, exploratory analysis, SQL data organization, visualization, and business interpretation using retail catalogue data.*
+**Pooja Singh** · [GitHub Profile](https://github.com/PoojaS-1616)

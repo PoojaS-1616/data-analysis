@@ -2,137 +2,141 @@
 BlinkIT Analytics Warehouse Builder & Verification Engine
 --------------------------------------------------------
 - Builds a relational SQLite database (blinkit_warehouse.db) implementing the Star Schema
-- Populates dim_products, dim_outlets, and fact_inventory_pricing from BlinkIT_Grocery_Data_Cleaned.csv
-- Executes and validates all 5 advanced analytical SQL views
-- Verifies exact arithmetic totals and dimensional integrity
+- Uses script-relative pathlib paths so execution is independent of current working directory
+- Enforces foreign keys (PRAGMA foreign_keys = ON) and unique (product_key, outlet_key) grain
+- Performs deterministic full rebuilds (DROP/CREATE + load) without duplicate inflation
+- Executes and validates all 5 analytical SQL views
 """
 
-import os
+from pathlib import Path
 import sqlite3
 import pandas as pd
 
-def build_warehouse():
-    print("=" * 80)
-    print("BUILDING BLINKIT DIMENSIONAL ANALYTICS WAREHOUSE (STAR SCHEMA)")
-    print("=" * 80)
+BASE_DIR = Path(__file__).resolve().parent
 
-    csv_path = 'BlinkIT_Grocery_Data_Cleaned.csv'
-    sql_script_path = 'blinkit_warehouse.sql'
-    db_path = 'blinkit_warehouse.db'
 
-    if not os.path.exists(csv_path):
-        raise FileNotFoundError(f"Cleaned dataset not found at '{csv_path}'")
-    if not os.path.exists(sql_script_path):
-        raise FileNotFoundError(f"SQL DDL script not found at '{sql_script_path}'")
+def build_warehouse(
+    csv_path: Path | str | None = None,
+    sql_script_path: Path | str | None = None,
+    db_path: Path | str | None = None,
+    verbose: bool = True,
+) -> Path:
+    csv_file = Path(csv_path) if csv_path is not None else BASE_DIR / "BlinkIT_Grocery_Data_Cleaned.csv"
+    sql_file = Path(sql_script_path) if sql_script_path is not None else BASE_DIR / "blinkit_warehouse.sql"
+    db_file = Path(db_path) if db_path is not None else BASE_DIR / "blinkit_warehouse.db"
 
-    print(f"Loading cleaned dataset: {csv_path}...")
-    df = pd.read_csv(csv_path)
-    print(f"Loaded {len(df):,} rows x {len(df.columns)} columns.\n")
+    if not csv_file.exists():
+        raise FileNotFoundError(f"Cleaned dataset not found at '{csv_file}'")
+    if not sql_file.exists():
+        raise FileNotFoundError(f"SQL DDL script not found at '{sql_file}'")
 
-    # Connect to SQLite
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+    if verbose:
+        print("=" * 80)
+        print("BUILDING BLINKIT DIMENSIONAL ANALYTICS WAREHOUSE (STAR SCHEMA)")
+        print("=" * 80)
+        print(f"Loading cleaned dataset: {csv_file}...")
 
-    # Execute DDL & Views from SQL script
-    print(f"Executing DDL script from {sql_script_path}...")
-    with open(sql_script_path, 'r', encoding='utf-8') as f:
-        sql_commands = f.read()
-    
-    # Split by semicolon and execute
-    cursor.executescript(sql_commands)
-    conn.commit()
-    print("Star Schema tables and analytical views created successfully.")
+    df = pd.read_csv(csv_file)
+    if verbose:
+        print(f"Loaded {len(df):,} rows x {len(df.columns)} columns.\n")
 
-    # 1. Populate dim_products
-    print("\n[1/3] Populating dim_products...")
-    products_df = df[[
-        'Item Identifier', 'Item Category', 'Item Type', 'Item Fat Content', 'Item Weight'
-    ]].drop_duplicates(subset=['Item Identifier']).reset_index(drop=True)
-    
-    products_df.rename(columns={
-        'Item Identifier': 'item_identifier',
-        'Item Category': 'product_family',
-        'Item Type': 'item_type',
-        'Item Fat Content': 'item_fat_content',
-        'Item Weight': 'item_weight'
-    }, inplace=True)
-    products_df['is_edible'] = products_df['product_family'].isin(['Food', 'Drinks'])
-    products_df['product_key'] = products_df.index + 1
+    conn = sqlite3.connect(db_file)
+    try:
+        conn.execute("PRAGMA foreign_keys = ON;")
+        cursor = conn.cursor()
 
-    products_df[['product_key', 'item_identifier', 'product_family', 'item_type', 'item_fat_content', 'item_weight', 'is_edible']].to_sql(
-        'dim_products', conn, if_exists='append', index=False
-    )
-    print(f"-> Inserted {len(products_df):,} distinct products into dim_products.")
+        if verbose:
+            print(f"Executing DDL script from {sql_file}...")
+        sql_commands = sql_file.read_text(encoding="utf-8")
+        cursor.executescript(sql_commands)
+        conn.execute("PRAGMA foreign_keys = ON;")
+        conn.commit()
 
-    # 2. Populate dim_outlets
-    print("\n[2/3] Populating dim_outlets...")
-    outlets_df = df[[
-        'Outlet Identifier', 'Outlet Type', 'Outlet Location Type', 'Outlet Size', 
-        'Outlet Establishment Year', 'Outlet Age'
-    ]].drop_duplicates(subset=['Outlet Identifier']).reset_index(drop=True)
+        # 1. Populate dim_products
+        products_df = (
+            df[["Item Identifier", "Item Category", "Item Type", "Item Fat Content", "Item Weight"]]
+            .drop_duplicates(subset=["Item Identifier"])
+            .sort_values("Item Identifier")
+            .reset_index(drop=True)
+        )
+        products_df = products_df.rename(
+            columns={
+                "Item Identifier": "item_identifier",
+                "Item Category": "product_family",
+                "Item Type": "item_type",
+                "Item Fat Content": "item_fat_content",
+                "Item Weight": "item_weight",
+            }
+        )
+        products_df["is_edible"] = products_df["product_family"].isin(["Food", "Drinks"]).astype(int)
+        products_df["product_key"] = products_df.index + 1
+        products_df[
+            ["product_key", "item_identifier", "product_family", "item_type", "item_fat_content", "item_weight", "is_edible"]
+        ].to_sql("dim_products", conn, if_exists="append", index=False)
 
-    outlets_df.rename(columns={
-        'Outlet Identifier': 'outlet_identifier',
-        'Outlet Type': 'outlet_type',
-        'Outlet Location Type': 'outlet_location_tier',
-        'Outlet Size': 'outlet_size',
-        'Outlet Establishment Year': 'establishment_year',
-        'Outlet Age': 'outlet_age'
-    }, inplace=True)
-    outlets_df['outlet_key'] = outlets_df.index + 1
+        # 2. Populate dim_outlets
+        outlets_df = (
+            df[["Outlet Identifier", "Outlet Type", "Outlet Location Type", "Outlet Size", "Outlet Establishment Year", "Outlet Age"]]
+            .drop_duplicates(subset=["Outlet Identifier"])
+            .sort_values("Outlet Identifier")
+            .reset_index(drop=True)
+        )
+        outlets_df = outlets_df.rename(
+            columns={
+                "Outlet Identifier": "outlet_identifier",
+                "Outlet Type": "outlet_type",
+                "Outlet Location Type": "outlet_location_tier",
+                "Outlet Size": "outlet_size",
+                "Outlet Establishment Year": "establishment_year",
+                "Outlet Age": "outlet_age",
+            }
+        )
+        outlets_df["outlet_key"] = outlets_df.index + 1
+        outlets_df[
+            ["outlet_key", "outlet_identifier", "outlet_type", "outlet_location_tier", "outlet_size", "establishment_year", "outlet_age"]
+        ].to_sql("dim_outlets", conn, if_exists="append", index=False)
 
-    outlets_df[['outlet_key', 'outlet_identifier', 'outlet_type', 'outlet_location_tier', 'outlet_size', 'establishment_year', 'outlet_age']].to_sql(
-        'dim_outlets', conn, if_exists='append', index=False
-    )
-    print(f"-> Inserted {len(outlets_df):,} distinct outlets into dim_outlets.")
+        # 3. Populate fact_inventory_pricing
+        fact_df = df.merge(products_df[["item_identifier", "product_key"]], left_on="Item Identifier", right_on="item_identifier")
+        fact_df = fact_df.merge(outlets_df[["outlet_identifier", "outlet_key"]], left_on="Outlet Identifier", right_on="outlet_identifier")
+        fact_df["fact_key"] = fact_df.index + 1
+        fact_df["sales_mrp"] = fact_df["Sales"]
+        fact_df["item_visibility"] = fact_df["Item Visibility"]
+        fact_df["customer_rating"] = fact_df["Rating"]
 
-    # 3. Populate fact_inventory_pricing
-    print("\n[3/3] Populating fact_inventory_pricing...")
-    # Merge keys
-    fact_df = df.merge(products_df[['item_identifier', 'product_key']], left_on='Item Identifier', right_on='item_identifier')
-    fact_df = fact_df.merge(outlets_df[['outlet_identifier', 'outlet_key']], left_on='Outlet Identifier', right_on='outlet_identifier')
-    fact_df['fact_key'] = fact_df.index + 1
-    fact_df['sales_mrp'] = fact_df['Sales']
-    fact_df['item_visibility'] = fact_df['Item Visibility']
-    fact_df['customer_rating'] = fact_df['Rating']
+        fact_df[["fact_key", "product_key", "outlet_key", "item_visibility", "sales_mrp", "customer_rating"]].to_sql(
+            "fact_inventory_pricing", conn, if_exists="append", index=False
+        )
+        conn.commit()
 
-    fact_to_load = fact_df[['fact_key', 'product_key', 'outlet_key', 'item_visibility', 'sales_mrp', 'customer_rating']]
-    fact_to_load.to_sql('fact_inventory_pricing', conn, if_exists='append', index=False)
-    print(f"-> Inserted {len(fact_to_load):,} records into fact_inventory_pricing.")
+        # Verify referential integrity
+        fk_errors = conn.execute("PRAGMA foreign_key_check;").fetchall()
+        if fk_errors:
+            raise RuntimeError(f"Foreign key violations detected: {fk_errors}")
 
-    conn.commit()
+        if verbose:
+            print(f"-> dim_products:           {len(products_df):,} rows")
+            print(f"-> dim_outlets:            {len(outlets_df):,} rows")
+            print(f"-> fact_inventory_pricing: {len(fact_df):,} rows (0 FK violations)")
+            print("\n" + "=" * 80)
+            print("VERIFYING ANALYTICAL SQL VIEWS")
+            print("=" * 80)
+            for title, query in [
+                ("VIEW 2: Outlet Assortment Gap Analysis", "SELECT * FROM vw_outlet_assortment_gap"),
+                ("VIEW 3: Format-Controlled Location Tiers", "SELECT * FROM vw_format_controlled_tiers"),
+                ("VIEW 4: Top 5 Categories by Recorded Sales Metric Share", "SELECT * FROM vw_category_pareto LIMIT 5"),
+                ("VIEW 5: Top 10 Grocery Store Missing-SKU Candidates", "SELECT * FROM vw_missing_sku_prioritization LIMIT 10"),
+            ]:
+                print(f"\n--- {title} ---")
+                print(pd.read_sql_query(query, conn).to_string(index=False))
+            print("\n" + "=" * 80)
+            print(f"DATABASE BUILD COMPLETE: '{db_file}'")
+            print("=" * 80)
+    finally:
+        conn.close()
 
-    # -------------------------------------------------------------------------
-    # VERIFICATION & QUERY EXECUTION
-    # -------------------------------------------------------------------------
-    print("\n" + "=" * 80)
-    print("VERIFYING ANALYTICAL SQL VIEWS")
-    print("=" * 80)
+    return db_file
 
-    # View 2: Outlet Assortment Gap
-    print("\n--- VIEW 2: Outlet Assortment Gap Analysis ---")
-    v2_df = pd.read_sql_query("SELECT * FROM vw_outlet_assortment_gap", conn)
-    print(v2_df.to_string(index=False))
 
-    # View 3: Format-Controlled Location Tiers (Simpson's Paradox Proof)
-    print("\n--- VIEW 3: Format-Controlled Location Tiers (Debunking Tier-2 Bias) ---")
-    v3_df = pd.read_sql_query("SELECT * FROM vw_format_controlled_tiers", conn)
-    print(v3_df.to_string(index=False))
-
-    # View 4: Top 5 Pareto Categories
-    print("\n--- VIEW 4: Top 5 Categories by Cumulative Revenue Share (Pareto) ---")
-    v4_df = pd.read_sql_query("SELECT * FROM vw_category_pareto LIMIT 5", conn)
-    print(v4_df.to_string(index=False))
-
-    # View 5: Top 10 Missing SKUs to Prioritize for Grocery Stores
-    print("\n--- VIEW 5: Top 10 Grocery Store SKU Expansion Candidates ---")
-    v5_df = pd.read_sql_query("SELECT * FROM vw_missing_sku_prioritization LIMIT 10", conn)
-    print(v5_df.to_string(index=False))
-
-    conn.close()
-    print("\n" + "=" * 80)
-    print(f"DATABASE BUILD COMPLETE: '{db_path}' is ready for reporting & analytics.")
-    print("=" * 80)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     build_warehouse()

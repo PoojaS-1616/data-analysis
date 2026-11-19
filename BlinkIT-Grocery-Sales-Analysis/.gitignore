@@ -38,3 +38,14 @@ Thumbs.db
 # Project archives and local database
 *.zip
 *.db
+
+# Restricted source dataset & derived cleaned CSV (not redistributed in GitHub)
+BlinkIT Grocery Data.xlsx
+BlinkIT_Grocery_Data.xlsx
+BlinkIT_Grocery_Data_Cleaned.csv
+
+# Temporary UI exports and intermediate data files
+blinkit_missing_sku_candidates.csv
+blinkit_recommended_expansion_skus.csv
+*.tmp
+*.bak
