@@ -1,108 +1,93 @@
 # Amazon India Business Performance Dashboard
 
-An Excel dashboard that turns 10,000 Amazon India orders into a single dashboard sheet of KPIs, charts and findings.
+An Excel business intelligence dashboard that analyzes 10,000 synthetic e-commerce orders (January 2024 – August 2026) across KPIs, monthly and annual trends, category and product performance, order outcomes, payment methods, fulfillment channels, and shipping states.
+
+> **Portfolio Transparency Notice:** This project uses a **synthetic (simulated) dataset** created for portfolio demonstration of Microsoft Excel modeling, dynamic PivotTables, and business analysis. It does **not** represent Amazon's confidential internal sales records, and findings are illustrative rather than actual Amazon India financial performance.
 
 ## Dashboard Preview
 
 ![Amazon India Business Performance Dashboard](./Amazon_Indian_Dashboard_Preview.png)
 
-## What it answers
+## What It Answers
 
-**1. What is the overall recorded performance?**
+1. **Overall recorded performance:** Recorded sales value, recorded profit, total orders, ordered quantity, average order value (AOV), recorded profit margin, monthly trends (Jan 2024 – Aug 2026), full-year 2024 vs 2025 growth, and like-for-like Jan–Aug 2026 YoY growth.
+2. **Category and product contribution:** Recorded sales value, profit, ordered quantity, order counts, and sales share by category, plus Top 10 products ranked dynamically via PivotTable.
+3. **Order outcomes:** Delivered, Shipped, Returned, and Cancelled order counts and shares (denominator: all 10,000 recorded orders), combined return + cancellation rate and associated sales value, plus category-level breakdowns.
+4. **Payment, fulfillment, and geographic drivers:** Recorded sales value, profit, sales share, and return/cancellation rates by payment method, fulfillment channel, and state.
 
-Total recorded sales value, recorded profit, order count, total ordered quantity, average order value and recorded profit margin, plus monthly sales-value and profit trends from January 2024 to August 2026.
+**Metric definitions:**
+- **Recorded Sales Value** and **Ordered Quantity** include all order statuses (Delivered, Shipped, Returned, Cancelled) and must not be interpreted as delivered revenue or delivered units.
+- **Shipped** orders are still in progress and are kept separate from **Delivered** orders.
+- **Returned and Cancelled associated sales value** is the gross recorded order value tied to those statuses, not confirmed financial loss.
+- **Recorded Profit Margin** uses `SUM(Profit_INR) / SUM(Total_Sales_INR)` on the supplied profit column. Because all 985 Returned and Cancelled rows carry `Profit_INR = 0`, excluding those statuses mechanically raises the recorded margin from **21.29%** to **23.67%** (Delivered + Shipped; **23.59%** for Delivered only) by shrinking the denominator rather than indicating higher per-order profitability.
 
-**2. Which categories and products contribute the most?**
+## Dataset & Methodology
 
-Recorded sales value, profit and ordered quantity by category, plus the top 10 products by recorded sales value.
+- **Source & nature:** 10,000 synthetic order records spanning `2024-01-01` to `2026-08-30` (`Raw_Data` sheet, Excel Table `RawData`).
+- **Columns (14):** `Order_ID`, `Order_Date`, `Order_Month` (calculated column `=TEXT([@[Order_Date]],"yyyy-mm")`), `Category`, `Product`, `Quantity`, `Unit_Price_INR`, `Discount_Pct`, `Total_Sales_INR`, `Profit_INR`, `Payment_Method`, `Fulfillment`, `Order_Status`, and `Ship_State`.
+- **Synthetic pricing & margin assumptions (important limitations):**
+  - Within each category, all five products share an identical uniform unit-price band (e.g., all `Electronics & Mobiles` items—including `Laptop Backpack`, `Power Bank 20000mAh`, and `5G Smartphone`—span ₹800–₹34,993 with medians around ₹17,300–₹18,100). Consequently, `Laptop Backpack` ranks #1 in recorded sales (₹2.65 Cr) ahead of `5G Smartphone` (₹2.43 Cr) due to simulated pricing and order volume, not real-world retail pricing.
+  - Across all five categories, per-order profit margins on Delivered and Shipped orders follow the same uniform 12.0%–35.0% range (mean 23.3%–23.7%). Product rankings and category profitability should therefore be interpreted as illustrative demonstrations of analytical methodology.
+- **Data cleaning & validation:** Detailed validation checks (missing values, duplicates, date conversion, discount bounds, and label consistency) are documented in [Data_Cleaning_Process.md](./Data_Cleaning_Process.md).
 
-**3. What are the order outcomes?**
+## What the Data Shows (Illustrative Findings)
 
-Counts of delivered, shipped, returned and cancelled orders, with returned and cancelled shares calculated against all recorded orders, plus a category-wise breakdown.
+Every metric below is formula-driven and directly traceable to the workbook's summary sheets:
 
-**4. Where does the recorded business value come from?**
+- **Recorded sales, profit, and margins (`Dashboard`, `Order_Status`):** Recorded sales value is **₹15.58 crore** (₹15,57,89,894) and recorded profit is **₹3.32 crore** (₹3,31,67,008), giving an overall recorded profit margin of **21.29%**. Excluding Returned and Cancelled orders (Delivered + Shipped, 9,015 orders, ₹14.01 crore sales), recorded margin is **23.67%** (**23.59%** on the 8,147 Delivered-only orders).
+- **Annual & like-for-like growth (`Annual_Analysis`):**
+  - **Full-year 2024 vs 2025:** Recorded sales increased from **₹5.70 crore** (3,705 orders; AOV ₹15,388) to **₹5.74 crore** (3,744 orders; AOV ₹15,338)—a **+0.73%** increase driven by **+1.05%** order-volume growth partially offset by a **−0.32%** AOV change.
+  - **Like-for-like partial year (Jan–Aug):** Because 2026 covers only January–August, it is excluded from full-year comparisons and evaluated against equivalent Jan–Aug periods. Jan–Aug 2026 recorded sales (**₹4.14 crore**, 2,551 orders) grew **+7.52% YoY** vs Jan–Aug 2025 (**₹3.85 crore**, 2,482 orders), with orders up **+2.78%** and profit up **+9.61%**.
+- **Category concentration (`Category_Analysis`, `Annual_Analysis`):** `Electronics & Mobiles` contributes **79.32%** of recorded sales (₹12.36 crore) from **30.45%** of orders (3,045 orders)—a pattern that holds consistently across 2024, 2025, and Jan–Aug 2026.
+- **Returned and cancelled orders (`Order_Status`, `Category_Returns_Cancellations`):** Out of 10,000 orders, **485** are Returned (**4.85%**) and **500** are Cancelled (**5.00%**), a combined rate of **9.85%** carrying **₹1.56 crore** (₹1,56,48,743; 10.04% of recorded sales) in associated sales value. Across categories, the combined rate ranges from **8.81%** (`Pantry & Groceries`) to **10.61%** (`Beauty & Personal Care`).
+- **Fulfillment performance (`Fulfillment_Analysis`):** `Amazon (FBA)` accounts for **69.02%** of recorded sales (7,054 orders) with a **9.31%** combined R+C rate (**4.76%** returned, **4.55%** cancelled), compared with `Seller Flex` (**20.03%** sales; **11.24%** R+C: **4.93%** returned, **6.31%** cancelled) and `Merchant (FBM)` (**10.95%** sales; **10.92%** R+C: **5.31%** returned, **5.61%** cancelled).
+- **Payment methods (`Payment_Analysis`):** `UPI` accounts for **50.40%** of recorded sales (4,972 orders; **9.88%** R+C: 4.87% returned, 5.01% cancelled), followed by `Credit/Debit Card` (**19.94%** sales; **11.04%** R+C), `Cash on Delivery (COD)` (**14.83%** sales; **9.05%** R+C), `Net Banking` (**9.90%** sales; **9.47%** R+C), and `Amazon Pay Later` (**4.93%** sales; **7.63%** R+C).
+- **Geography (`State_Analysis`):** `Maharashtra` (18.97%), `Karnataka` (15.67%), and `Delhi` (14.35%) together contribute **49.00%** of recorded sales (₹7.63 crore across 4,799 orders).
 
-Recorded sales value and profit by payment method and fulfilment method, plus recorded sales value, profit and order counts by state.
+## Recommendations (Illustrative Business Actions)
 
-**Metric definitions:** Sales value and ordered quantity include all order statuses. They should not be interpreted as delivered sales or delivered units. Shipped orders are still in progress. Profit uses the values supplied in the dataset.
+1. **Manage category concentration risk:** Because `Electronics & Mobiles` drives 79.32% of recorded sales, evaluate growth pilots in `Home & Kitchen` (11.54%) and `Apparel & Fashion` (6.31%) using delivered-order value, order counts, and realized margins before scaling.
+2. **Track return and cancellation reasons separately:** Capture granular reason codes (delivery delay, damaged item, buyer remorse) for Returned vs Cancelled orders. Prioritize `Electronics & Mobiles` first because its high AOV concentrates the largest associated sales value, even though its combined R+C rate (9.85%) matches the portfolio average.
+3. **Validate segment gaps as hypotheses, not causes:** Observed R+C rate differences—such as `Seller Flex` (11.24%) vs `Amazon (FBA)` (9.31%) or `Credit/Debit Card` (11.04%) vs `Amazon Pay Later` (7.63%)—should be tested for statistical significance and controlled for category mix, order value, and time period before operational changes.
+4. **Monitor growth drivers consistently:** While full-year 2024→2025 growth was flat (+0.73%: +1.05% volume, −0.32% AOV), like-for-like Jan–Aug 2026 grew +7.52% YoY. Continue tracking volume, AOV, and category mix on matched calendar windows rather than comparing partial years to full years.
 
-## What the data shows
+## How It's Built
 
-- **Recorded sales and profit:** The dataset records approximately **₹15.58 crore in sales value** and **₹3.32 crore in profit**, giving a recorded profit margin of **21.29%**. Sales value includes returned and cancelled orders. Excluding those statuses, the recorded margin is **23.67%**.
-
-- **Category concentration:** Electronics & Mobiles contributes approximately **79% of recorded sales value** from **30% of orders**, showing substantial dependence on one category.
-
-- **Returned and cancelled orders:** There are **485 returned orders** and **500 cancelled orders**, representing **4.85%** and **5.00%** of all recorded orders. Their combined share is **9.85%**.
-
-- **Associated sales value:** Returned and cancelled orders carry approximately **₹1.56 crore in recorded sales value**. This is the value associated with these statuses, not confirmed financial loss.
-
-- **Category differences:** The combined returned and cancelled share ranges from approximately **8.8% to 10.6%** across categories. Electronics has the largest associated sales value because of its high contribution to overall sales.
-
-- **Annual performance:** Recorded sales value increased from approximately **₹5.70 crore in 2024** to **₹5.74 crore in 2025**, a rise of **0.73%**. The 2026 data covers January to August and is excluded from this full-year comparison.
-
-- **Payments and fulfilment:** UPI accounts for approximately **50% of recorded sales value**, while Amazon-fulfilled (FBA) orders account for approximately **69%**.
-
-- **Geography:** Maharashtra, Karnataka and Delhi together contribute approximately **49% of recorded sales value**.
-  
-## Recommendations
-
-1. **Review category concentration.** Electronics & Mobiles contributes approximately 79% of recorded sales value. Evaluate opportunities in Home & Kitchen and Apparel & Fashion through small, measurable pilots. Compare delivered order value, order counts and recorded margins before recommending wider expansion.
-
-2. **Investigate returns and cancellations separately.** Capture reasons for each status, such as delivery problems, product issues or customer cancellation. Similar rates across categories justify checking shared processes, but do not establish a common cause. Prioritise Electronics for investigation because it has the largest recorded sales value associated with these statuses.
-
-3. **Validate differences between business segments.** Compare return and cancellation rates across fulfilment methods, payment methods and states alongside their order counts. Check whether differences persist after considering category mix, order value and time period. Treat the observed gaps as hypotheses for investigation.
-
-4. **Investigate the drivers of slow growth.** Recorded sales value increased by only 0.73% between 2024 and 2025. Break this change into order volume, average order value and category mix to identify which factors contributed. Compare equivalent periods when analysing the partial 2026 data.
-
-## How it's built
-
-The `Raw_Data` sheet stores the orders in an Excel Table named `RawData`. Summary formulas use table references, so additional records are included when they become part of this table.
-
-The `Order_Month` calculated column derives a monthly grouping label from each order date.
+The `Raw_Data` sheet stores all 10,000 orders in an Excel Table named `RawData` (`A1:N10001`). Every KPI, summary table, and chart references structured table columns (`RawData[...]`) so new rows added to the table flow into calculations automatically.
 
 | Sheet | Purpose |
 |---|---|
-| `Dashboard` | KPIs and charts answering four business questions |
-| `Raw_Data` | Source records and the calculated `Order_Month` column |
-| `Monthly_KPIs`, `Category_Analysis` | Monthly and category summaries |
-| `Product_Summary` | PivotTable ranking the top 10 products by recorded sales value |
-| `Top_Products` | Links the ranked products to the dashboard chart |
-| `Order_Status`, `Category_Returns_Cancellations` | Order counts, status shares and category comparisons |
-| `Payment_Analysis`, `Fulfillment_Analysis`, `State_Analysis` | Summaries by payment method, fulfilment method and state |
+| `Dashboard` | Executive dashboard: 12 KPI cards, 9 charts across 4 business sections, dynamic header & footnote |
+| `Raw_Data` | 10,000 source records in Excel Table `RawData` + calculated `Order_Month` column |
+| `Monthly_KPIs` | 32-month time series (`2024-01` to `2026-08`) of Sales, Profit, Orders, Units, AOV, Margin |
+| `Annual_Analysis` | Full-year 2024/2025 growth decomposition, like-for-like Jan–Aug YoY, and YoY category shares |
+| `Category_Analysis` | Category Sales, Profit, Ordered Quantity, Sales Share %, Orders, and Profit Margin % |
+| `Product_Summary` | PivotTable (`PivotTable1`) dynamically ranking Top 10 products by Recorded Sales Value |
+| `Top_Products` | Links ranked Top 10 products from `Product_Summary` to Dashboard Chart 4 + `INDEX/MATCH` category |
+| `Order_Status` | Status counts, shares, sales, profit, margins, combined R+C, Excl. R/C, and Delivered-only audits |
+| `Category_Returns_Cancellations` | Category Returned & Cancelled counts, total orders, and combined R+C % |
+| `Payment_Analysis` | Payment Sales, Profit, Sales Share %, Orders, and Returned / Cancelled / Combined R+C % |
+| `Fulfillment_Analysis` | Fulfillment Sales, Profit, Sales Share %, Orders, and Returned / Cancelled / Combined R+C % |
+| `State_Analysis` | State Sales, Profit, Orders, Sales Share %, R+C rates, and Top-3 states rollup |
 
-### Updating the dashboard
+### Updating the Dashboard
 
-- With Excel calculation set to **Automatic**, formula-based summaries recalculate when the table data changes.
-- Select **Data → Refresh All** to update the product PivotTable and Top 10 ranking. The PivotTable is also configured to refresh when the workbook opens.
-- New records must be included within the `RawData` table.
-
-### Current limitations
-
-- Lists of months, categories, payment methods, fulfilment methods, states and order statuses are maintained manually. New labels require corresponding helper rows, formulas and chart-range updates.
-- The dashboard's date-range and order-count subtitle is typed text and must be updated when the dataset changes.
-
-## The dataset
-
-10,000 orders from January 2024 to August 2026.
-
-- **Each row has:** `Order_ID`, `Order_Date`, `Order_Month` (helper), `Category`, `Product`, `Quantity`, `Unit_Price_INR`, `Discount_Pct`, `Total_Sales_INR`, `Profit_INR`, `Payment_Method`, `Fulfillment`, `Order_Status` and `Ship_State`.
-
-- **Important**: returned and cancelled orders still carry a sales value in the data, but their profit is zero. So Total Sales is the sales value recorded in the dataset (gross, including those orders), and the return and cancellation analysis shows the orders associated with those statuses.
+- Keep Excel calculation set to **Formulas → Calculation Options → Automatic** so all formula-based summaries and the dynamic Dashboard subtitle/footnote recalculate automatically when `RawData` changes.
+- Select **Data → Refresh All** to update `PivotTable1` (`Product_Summary`) and the Top 10 ranking (`Top_Products`). The PivotTable is also configured to refresh on open.
+- **Current limitations:** Grouping label lists (months, categories, payment methods, fulfillment methods, states, order statuses) are maintained manually on the summary sheets; introducing a brand-new month or label requires adding a corresponding row and extending chart ranges.
 
 ## Tools
 
-**Microsoft Excel:** Excel Tables, structured references, SUMIFS, COUNTIFS, TEXT, INDEX/MATCH, PivotTables and charts.
+**Microsoft Excel:** Excel Tables (`RawData`), structured references, `SUMIFS`, `COUNTIFS`, `IFERROR`, `TEXT`, `UNICHAR`, `INDEX/MATCH`, PivotTables, and native charts.
 
-## Using it
+## Using It
 
-1. Download [the Excel workbook](https://raw.githubusercontent.com/PoojaS-1616/data-analyst-portfolio/main/amazon-indian-business-dashboard-main/Amazon_India_Business_Performance_Dashboard.xlsx) and open it in Microsoft Excel.
-2. Go to the **Dashboard** sheet. Set **Formulas → Calculation Options → Automatic** so formulas recalculate when data changes.
-3. To add records, extend the `RawData` table on the `Raw_Data` sheet. Preserve the column headers, enter `Order_Date` as an Excel date, and check that the `Order_Month` formula fills into the new rows.
-4. After changing data, select **Data → Refresh All** to refresh the product PivotTable and Top 10 ranking. If formula results remain unchanged, press **Ctrl + Alt + F9** to force recalculation.
-5. If you introduce new months or grouping labels, update the relevant helper lists, formulas and chart ranges. Update the dashboard's typed date-range and order-count subtitle when needed.
-6. Check the dashboard totals and product ranking, then save the workbook.
+1. Download [the Excel workbook](https://raw.githubusercontent.com/PoojaS-1616/data-analysis/main/amazon-indian-business-dashboard-main/Amazon_India_Business_Performance_Dashboard.xlsx) and open it in Microsoft Excel (the workbook opens directly on the **Dashboard** tab).
+2. Ensure **Formulas → Calculation Options → Automatic** is enabled.
+3. To append new records, add rows directly inside the `RawData` table on `Raw_Data` using true Excel dates in `Order_Date`; `Order_Month` (`=TEXT([@[Order_Date]],"yyyy-mm")`) fills automatically.
+4. Select **Data → Refresh All** to refresh the Top 10 product PivotTable (press **Ctrl + Alt + F9** if a full recalculation is needed).
+5. Review [Data_Cleaning_Process.md](./Data_Cleaning_Process.md) for the complete validation and preparation notes.
 
-## What I learned
+## What I Learned
 
-Designing for a non-technical reader changes the work. Choosing which numbers to leave out mattered as much as choosing which to show, and writing the business question above each section kept every chart tied to a business question.
-
+Designing for executive and non-technical readers requires as much discipline in **metric definitions and transparency** as in Excel modeling: clearly separating recorded sales from delivered revenue, disclosing synthetic data constraints upfront, and ensuring every headline number in prose is backed by a traceable, refreshable formula in the workbook.
