@@ -1,8 +1,12 @@
 {
   "source_csv": "Smoking_Health_Analysis.csv",
+  "source_csv_sha256": "2623012EFFA755D635A0F360E68DE96B589EB35D708AA017AEA28022264F3B37",
   "rows": 10000,
+  "columns": 15,
   "distinct_patient_ids": 10000,
   "missing_values": 0,
+  "exact_duplicate_rows": 0,
+  "bp_anomaly_count_diastolic_ge_systolic": 49,
   "smoking_status_counts": {
     "Never Smoked": 4263,
     "Current Smoker": 3015,
@@ -10,23 +14,36 @@
   },
   "patients_with_recorded_organ": 7227,
   "patients_with_recorded_condition": 5772,
-  "average_cigarettes_per_day_current_smokers": 17.112106135986732,
+  "average_cigarettes_per_day_current_smokers": 17.1121,
   "overall_average_cigarettes_per_day": 5.1593,
-  "bp_risk_counts": {
+  "bp_risk_counts_primary_130_80": {
     "High": 6049,
     "Lower Range": 2500,
     "Elevated": 1451
   },
-  "avg_cholesterol_by_bp_risk": {
+  "avg_cholesterol_by_bp_primary_130_80": {
     "Elevated": 195.73,
     "High": 197.81,
     "Lower Range": 195.35
   },
-  "model_measure_count": 7,
+  "bp_risk_counts_alternative_140_90": {
+    "High": 2447,
+    "Elevated": 5053,
+    "Lower Range": 2500
+  },
+  "avg_cholesterol_by_bp_alternative_140_90": {
+    "Elevated": 197.18,
+    "High": 197.87,
+    "Lower Range": 195.35
+  },
+  "portable_data_parameter": "DataFolderPath",
+  "model_table_count": 2,
+  "model_measure_count": 17,
   "report_pages": [
     "Executive Overview",
     "Detailed Health Analysis"
   ],
+  "report_visual_count": 20,
   "slicer_sync_groups": {
     "Gender": 2,
     "Smoking Status": 2,
@@ -34,5 +51,9 @@
   },
   "theme_registered": true,
   "report_opens_on": "ExecutiveOverview",
+  "statistical_tests_reproduced": true,
+  "dax_slicer_keepfilters_verified_live": true,
+  "power_bi_model_load_and_refresh_verified": true,
+  "dataset_tracked_in_git": false,
   "rendered_in_power_bi_desktop": false
 }
