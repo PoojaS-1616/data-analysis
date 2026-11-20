@@ -12,6 +12,9 @@ from pathlib import Path
 import streamlit as st
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+APP_DIR = Path(__file__).resolve().parent
+# Prevent app/app.py from shadowing the `app` package when launched via `streamlit run app/app.py`
+sys.path = [p for p in sys.path if Path(p).resolve() != APP_DIR]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 

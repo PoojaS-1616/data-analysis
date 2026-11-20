@@ -8,6 +8,7 @@ import streamlit as st
 
 from app.components import BLUE, NAVY, TEAL, render_header, render_kpi_card
 from app.utils import load_metrics, load_test_predictions
+from src.preprocessing import assign_marketing_segment
 
 
 def render() -> None:
@@ -58,9 +59,10 @@ def render() -> None:
             st.info("Saved test-set predictions CSV not present locally; run `src/train_pipeline.py` to generate.")
 
     with col_r:
-        if preds_df is not None and "Marketing_Segment" in preds_df.columns:
+        if preds_df is not None and "Purchase_Probability" in preds_df.columns:
+            seg_series = preds_df["Purchase_Probability"].astype(float).map(assign_marketing_segment)
             seg_counts = (
-                preds_df["Marketing_Segment"]
+                seg_series
                 .value_counts()
                 .reindex(
                     [
