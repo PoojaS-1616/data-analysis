@@ -75,7 +75,7 @@ All figures below are independently reproduced in Python (`scripts/validate_smok
 | `Smoking_and_Health_Analysis.Dataset/` | Semantic model (`model.bim` with `DataFolderPath`, `17` DAX measures, `BP Anomaly Flag`) |
 | `Smoking_and_Health_Analysis.Report/` | Redesigned 2-page PBIR report (`20` visuals) and Clinical Navy & Teal theme |
 | `Smoking_Health_Analysis.csv` | Local-only source dataset (**excluded via `.gitignore`**; not redistributed in GitHub) |
-| `Smoking_and_Health_Analysis_Report.md` | Full analytical & technical report (kept identical to root-level copy) |
+| [`../../Smoking_and_Health_Analysis_Report.md`](../../Smoking_and_Health_Analysis_Report.md) | Canonical full analytical & technical report (top-level project folder) |
 | `DATA_PROVENANCE.md` | Data-governance, provenance, privacy, and Windows `MAX_PATH` notice |
 | `validation_summary.json` | Verified validation metrics, BP sensitivity figures, and Power BI validation flags |
 | `scripts/validate_smoking_health.py` | Independent Python data-quality, 49-BP-anomaly, KPI, and DAX slicer validation |
@@ -130,7 +130,7 @@ py -3.14 scripts/statistical_analysis.py
 ## Tools and documentation
 
 - **Tools:** Microsoft Power BI Desktop (PBIP / PBIR / DAX / Power Query M), Python (`pandas`, `numpy`, `scipy`), Markdown, JSON.
-- **Detailed documentation:** [Smoking_and_Health_Analysis_Report.md](Smoking_and_Health_Analysis_Report.md) · [DATA_PROVENANCE.md](DATA_PROVENANCE.md).
+- **Detailed documentation:** [Smoking_and_Health_Analysis_Report.md](../../Smoking_and_Health_Analysis_Report.md) · [DATA_PROVENANCE.md](DATA_PROVENANCE.md) · [Top-Level Project README](../../README.md).
 
 ---
 
