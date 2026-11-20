@@ -58,7 +58,7 @@ Analysed **8,523 product–outlet records across 10 outlets** using Python, SQL 
 
 ### ShopSmart — E-Commerce Customer Purchase Prediction
 
-An end-to-end machine-learning project that predicts **cart-stage, pre-checkout purchase intent** using Logistic Regression, with a modular Python pipeline and a seven-page interactive Streamlit application.
+An end-to-end machine-learning project that predicts **cart-stage, pre-checkout purchase intent** using Logistic Regression, with a modular Python pipeline and an eight-page interactive Streamlit application.
 
 - Built a leak-free `scikit-learn` Logistic Regression pipeline (`L2`, `C = 1.0`) with training-fold IQR Winsorisation (`k = 1.5`) and empirical ablation / leakage audits across **10,000 customer sessions**.
 - Verified **held-out test results** (`n = 2,000`, threshold `0.50` — offline evaluation, not production performance):
@@ -67,7 +67,7 @@ An end-to-end machine-learning project that predicts **cart-stage, pre-checkout 
   - **F1-score:** `0.7921`
 - **Model Scope:** Designed strictly for **cart-stage / pre-checkout intent prediction** (using active cart features alongside session and profile attributes), **not** pre-shopping visitor prediction.
 
-**Deliverables:** Modular `src/` pipeline, executed 32-cell notebook, automated `pytest` suite (`9/9` passing), diagnostic figures, technical validation report, and seven-page Streamlit application.
+**Deliverables:** Modular `src/` pipeline, executed 32-cell notebook, automated `pytest` suite (`16/16` passing), diagnostic figures, technical validation reports, and eight-page Streamlit application with interactive Business Impact Simulator.
 
 [Explore ShopSmart](ShopSmart-Ecommerce-Purchase-Prediction/)
 
