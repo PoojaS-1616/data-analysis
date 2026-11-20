@@ -1,0 +1,31 @@
+# Python & virtual environments
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Environment variables & secrets
+.env
+.env.*
+
+# Raw datasets & generated prediction exports (excluded until redistribution rights are verified)
+data/raw/*.csv
+data/raw/*.xlsx
+outputs/*.csv
+
+# Serialized model binaries (regenerated locally via src/train_pipeline.py)
+models/*.joblib
+models/*.pkl
+
+# IDEs, OS & temporary files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.log

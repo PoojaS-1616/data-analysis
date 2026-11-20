@@ -1,0 +1,287 @@
+{
+  "dataset": {
+    "rows": 10000,
+    "columns": 19,
+    "missing_values": 2514,
+    "duplicate_rows": 0,
+    "purchase_positive_count": 6480,
+    "purchase_positive_rate": 0.648,
+    "purchase_negative_count": 3520,
+    "purchase_negative_rate": 0.352
+  },
+  "primary_model": {
+    "algorithm": "LogisticRegression (L2, C=1.0, IQR k=1.5)",
+    "intercept": 0.9656,
+    "feature_count_transformed": 26,
+    "train_metrics_t50": {
+      "accuracy": 0.7009,
+      "precision": 0.7267,
+      "recall": 0.863,
+      "f1": 0.789,
+      "roc_auc": 0.732,
+      "pr_auc": 0.8264,
+      "log_loss": 0.5678,
+      "brier_score": 0.1932
+    },
+    "test_metrics_t50": {
+      "accuracy": 0.7045,
+      "precision": 0.7279,
+      "recall": 0.8688,
+      "f1": 0.7921,
+      "roc_auc": 0.7411,
+      "pr_auc": 0.8388,
+      "log_loss": 0.5594,
+      "brier_score": 0.1903
+    },
+    "cv_5fold": {
+      "roc_auc_mean": 0.7281,
+      "roc_auc_std": 0.0071,
+      "pr_auc_mean": 0.8236,
+      "accuracy_mean": 0.6983,
+      "f1_mean": 0.7868,
+      "log_loss_mean": 0.5706
+    },
+    "confusion_matrix_t50": {
+      "TN": 283,
+      "FP": 421,
+      "FN": 170,
+      "TP": 1126
+    }
+  },
+  "iqr_ablation": {
+    "iqr_capped_k1.5": {
+      "cv_roc_auc_mean": 0.7281,
+      "cv_roc_auc_std": 0.0071,
+      "cv_pr_auc_mean": 0.8236,
+      "cv_accuracy_mean": 0.6983,
+      "cv_f1_mean": 0.7868,
+      "cv_log_loss_mean": 0.5706,
+      "test_metrics": {
+        "accuracy": 0.7045,
+        "precision": 0.7279,
+        "recall": 0.8688,
+        "f1": 0.7921,
+        "roc_auc": 0.7411,
+        "pr_auc": 0.8388,
+        "log_loss": 0.5594,
+        "brier_score": 0.1903
+      }
+    },
+    "uncapped_raw": {
+      "cv_roc_auc_mean": 0.7033,
+      "cv_roc_auc_std": 0.0077,
+      "cv_pr_auc_mean": 0.7977,
+      "cv_accuracy_mean": 0.6895,
+      "cv_f1_mean": 0.7864,
+      "cv_log_loss_mean": 0.597,
+      "test_metrics": {
+        "accuracy": 0.692,
+        "precision": 0.7066,
+        "recall": 0.8974,
+        "f1": 0.7906,
+        "roc_auc": 0.7072,
+        "pr_auc": 0.7994,
+        "log_loss": 0.5927,
+        "brier_score": 0.2012
+      }
+    },
+    "iqr_capped_k3.0": {
+      "cv_roc_auc_mean": 0.7279,
+      "cv_roc_auc_std": 0.0071,
+      "cv_pr_auc_mean": 0.8223,
+      "cv_accuracy_mean": 0.7001,
+      "cv_f1_mean": 0.7886,
+      "cv_log_loss_mean": 0.571,
+      "test_metrics": {
+        "accuracy": 0.704,
+        "precision": 0.7265,
+        "recall": 0.8711,
+        "f1": 0.7923,
+        "roc_auc": 0.7384,
+        "pr_auc": 0.8359,
+        "log_loss": 0.5615,
+        "brier_score": 0.1911
+      }
+    }
+  },
+  "feature_leakage_audit": {
+    "full_checkout_17_features": {
+      "cv_roc_auc_mean": 0.7281,
+      "cv_roc_auc_std": 0.0071,
+      "cv_pr_auc_mean": 0.8236,
+      "cv_accuracy_mean": 0.6983,
+      "cv_f1_mean": 0.7868,
+      "cv_log_loss_mean": 0.5706,
+      "test_metrics": {
+        "accuracy": 0.7045,
+        "precision": 0.7279,
+        "recall": 0.8688,
+        "f1": 0.7921,
+        "roc_auc": 0.7411,
+        "pr_auc": 0.8388,
+        "log_loss": 0.5594,
+        "brier_score": 0.1903
+      }
+    },
+    "pre_payment_16_features": {
+      "cv_roc_auc_mean": 0.729,
+      "cv_roc_auc_std": 0.0076,
+      "cv_pr_auc_mean": 0.8242,
+      "cv_accuracy_mean": 0.699,
+      "cv_f1_mean": 0.7875,
+      "cv_log_loss_mean": 0.57,
+      "test_metrics": {
+        "accuracy": 0.703,
+        "precision": 0.7262,
+        "recall": 0.8696,
+        "f1": 0.7914,
+        "roc_auc": 0.7409,
+        "pr_auc": 0.8388,
+        "log_loss": 0.5593,
+        "brier_score": 0.1903
+      }
+    },
+    "pre_cart_browsing_13_features": {
+      "cv_roc_auc_mean": 0.6444,
+      "cv_roc_auc_std": 0.0115,
+      "cv_pr_auc_mean": 0.7597,
+      "cv_accuracy_mean": 0.6641,
+      "cv_f1_mean": 0.78,
+      "cv_log_loss_mean": 0.6182,
+      "test_metrics": {
+        "accuracy": 0.678,
+        "precision": 0.6844,
+        "recall": 0.9336,
+        "f1": 0.7898,
+        "roc_auc": 0.6697,
+        "pr_auc": 0.7767,
+        "log_loss": 0.6059,
+        "brier_score": 0.209
+      }
+    }
+  },
+  "threshold_tradeoff": [
+    {
+      "threshold": 0.3,
+      "predicted_buyers": 1919,
+      "pct_targeted": 95.95,
+      "accuracy": 0.6745,
+      "precision": 0.6681,
+      "recall": 0.9892,
+      "f1": 0.7975
+    },
+    {
+      "threshold": 0.4,
+      "predicted_buyers": 1785,
+      "pct_targeted": 89.25,
+      "accuracy": 0.6965,
+      "precision": 0.693,
+      "recall": 0.9545,
+      "f1": 0.803
+    },
+    {
+      "threshold": 0.5,
+      "predicted_buyers": 1547,
+      "pct_targeted": 77.35,
+      "accuracy": 0.7045,
+      "precision": 0.7279,
+      "recall": 0.8688,
+      "f1": 0.7921
+    },
+    {
+      "threshold": 0.6,
+      "predicted_buyers": 1231,
+      "pct_targeted": 61.55,
+      "accuracy": 0.6905,
+      "precision": 0.775,
+      "recall": 0.7361,
+      "f1": 0.755
+    },
+    {
+      "threshold": 0.7,
+      "predicted_buyers": 883,
+      "pct_targeted": 44.15,
+      "accuracy": 0.6255,
+      "precision": 0.8097,
+      "recall": 0.5517,
+      "f1": 0.6563
+    },
+    {
+      "threshold": 0.75,
+      "predicted_buyers": 687,
+      "pct_targeted": 34.35,
+      "accuracy": 0.5935,
+      "precision": 0.8515,
+      "recall": 0.4514,
+      "f1": 0.59
+    },
+    {
+      "threshold": 0.8,
+      "predicted_buyers": 484,
+      "pct_targeted": 24.2,
+      "accuracy": 0.539,
+      "precision": 0.8864,
+      "recall": 0.331,
+      "f1": 0.482
+    }
+  ],
+  "top_positive_drivers": [
+    {
+      "feature": "Cart_Items",
+      "coefficient": 0.6073,
+      "odds_ratio": 1.8355
+    },
+    {
+      "feature": "Membership_Type_Premium",
+      "coefficient": 0.5395,
+      "odds_ratio": 1.7151
+    },
+    {
+      "feature": "Cart_Value_INR",
+      "coefficient": 0.4081,
+      "odds_ratio": 1.5039
+    },
+    {
+      "feature": "Session_Duration_Min",
+      "coefficient": 0.2735,
+      "odds_ratio": 1.3145
+    },
+    {
+      "feature": "Pages_Viewed",
+      "coefficient": 0.2622,
+      "odds_ratio": 1.2998
+    },
+    {
+      "feature": "Products_Viewed",
+      "coefficient": 0.2586,
+      "odds_ratio": 1.2951
+    }
+  ],
+  "top_negative_drivers": [
+    {
+      "feature": "Device_Type_Mobile",
+      "coefficient": -0.221,
+      "odds_ratio": 0.8017
+    },
+    {
+      "feature": "Traffic_Source_Paid Ads",
+      "coefficient": -0.2554,
+      "odds_ratio": 0.7746
+    },
+    {
+      "feature": "Traffic_Source_Referral",
+      "coefficient": -0.3219,
+      "odds_ratio": 0.7248
+    },
+    {
+      "feature": "Traffic_Source_Organic",
+      "coefficient": -0.3259,
+      "odds_ratio": 0.7219
+    },
+    {
+      "feature": "Traffic_Source_Social Media",
+      "coefficient": -0.3502,
+      "odds_ratio": 0.7046
+    }
+  ]
+}

@@ -13,6 +13,7 @@ The projects cover retail performance, profitability, product pricing and outlet
 | [Amazon India Business Performance](./amazon-indian-business-dashboard-main/) | Sales, profitability, category concentration and order outcomes | Excel |
 | [Supermart Grocery Sales](./Supermart-Grocery-Sales-Dashboard/) | Sales growth, regional performance, discounts and margins | Excel |
 | [BlinkIT Grocery Pricing & Catalogue](./BlinkIT-Grocery-Sales-Analysis/) | Data validation, pricing patterns and outlet assortment | Python, SQL, Streamlit |
+| [ShopSmart — E-Commerce Customer Purchase Prediction](ShopSmart-Ecommerce-Purchase-Prediction/) | Cart-stage / pre-checkout purchase intent prediction | Python, scikit-learn, Streamlit |
 
 ### Amazon India Business Performance Dashboard
 
@@ -54,6 +55,21 @@ Analysed **8,523 product–outlet records across 10 outlets** using Python, SQL 
 **Deliverables:** Analysis notebook, cleaned dataset, SQL scripts, visualisations and Streamlit application.
 
 [View project →](./BlinkIT-Grocery-Sales-Analysis/) · [View SQL script →](./BlinkIT-Grocery-Sales-Analysis/blinkit_warehouse.sql)
+
+### ShopSmart — E-Commerce Customer Purchase Prediction
+
+An end-to-end machine-learning project that predicts **cart-stage, pre-checkout purchase intent** using Logistic Regression, with a modular Python pipeline and a seven-page interactive Streamlit application.
+
+- Built a leak-free `scikit-learn` Logistic Regression pipeline (`L2`, `C = 1.0`) with training-fold IQR Winsorisation (`k = 1.5`) and empirical ablation / leakage audits across **10,000 customer sessions**.
+- Verified **held-out test results** (`n = 2,000`, threshold `0.50` — offline evaluation, not production performance):
+  - **ROC-AUC:** `0.7411`
+  - **PR-AUC:** `0.8388`
+  - **F1-score:** `0.7921`
+- **Model Scope:** Designed strictly for **cart-stage / pre-checkout intent prediction** (using active cart features alongside session and profile attributes), **not** pre-shopping visitor prediction.
+
+**Deliverables:** Modular `src/` pipeline, executed 32-cell notebook, automated `pytest` suite (`9/9` passing), diagnostic figures, technical validation report, and seven-page Streamlit application.
+
+[Explore ShopSmart](ShopSmart-Ecommerce-Purchase-Prediction/)
 
 ## Technical Skills Demonstrated
 
