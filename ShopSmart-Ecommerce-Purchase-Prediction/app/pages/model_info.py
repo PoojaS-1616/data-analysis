@@ -24,6 +24,8 @@ def render() -> None:
     spec_df = pd.DataFrame(
         [
             ("Model Version", MODEL_VERSION),
+            ("Evaluation Date", "2026-11-21 (Phase 8 leakage-safe validation & calibration audit)"),
+            ("Selected Features (17 Inputs)", "5 categorical (Gender, Device_Type, Traffic_Source, Membership_Type, Payment_Method) + 12 numeric (Age, Session_Duration_Min, Pages_Viewed, Products_Viewed, Cart_Items, Cart_Value_INR, Discount_Percent, Previous_Orders, Days_Since_Last_Visit, Email_Open_Rate, Customer_Rating, Returns_Last_Year)"),
             ("Algorithm", "L2-Regularized Logistic Regression (C = 1.0, max_iter = 1000, random_state = 42)"),
             ("Training / Test Split", "Stratified 80/20 split: 8,000 training rows / 2,000 held-out test rows"),
             ("Cross-Validation", f"5-Fold Stratified CV (ROC-AUC = {cv['roc_auc_mean']:.4f} ± {cv['roc_auc_std']:.4f})"),

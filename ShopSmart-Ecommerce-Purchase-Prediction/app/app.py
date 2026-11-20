@@ -18,6 +18,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.components import inject_theme_css
 from app.pages import (
     batch_prediction,
+    business_impact_simulator,
     business_insights,
     customer_analytics,
     executive_overview,
@@ -44,6 +45,7 @@ PAGES = {
     "5. Batch Prediction": batch_prediction.render,
     "6. Business Insights": business_insights.render,
     "7. Model Information": model_info.render,
+    "8. Business Impact Simulator": business_impact_simulator.render,
 }
 
 with st.sidebar:

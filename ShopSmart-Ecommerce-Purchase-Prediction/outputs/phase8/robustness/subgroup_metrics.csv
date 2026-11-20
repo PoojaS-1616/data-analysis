@@ -1,0 +1,23 @@
+Dimension,Subgroup,Sample_Count,Positive_Count,Positive_Rate,Sufficient_Sample,Warning,Precision,Recall,F1,ROC_AUC,PR_AUC,Brier_Score
+Device Type,Desktop,609,393,0.6453,True,,0.7183,0.9084,0.8022,0.7573,0.8477,0.1857
+Device Type,Missing,27,17,0.6296,False,Excluded ranking metrics: n=27 < 50,,,,,,
+Device Type,Mobile,1203,778,0.6467,True,,0.7329,0.8393,0.7825,0.7321,0.8299,0.1939
+Device Type,Tablet,161,108,0.6708,True,,0.7333,0.9167,0.8148,0.728,0.8594,0.1875
+Membership Type,Missing,41,22,0.5366,False,Excluded ranking metrics: n=41 < 50,,,,,,
+Membership Type,New,827,496,0.5998,True,,0.7045,0.8266,0.7607,0.7538,0.8207,0.1947
+Membership Type,Premium,294,220,0.7483,True,,0.7835,0.9045,0.8397,0.7007,0.8768,0.1743
+Membership Type,Regular,838,558,0.6659,True,,0.7345,0.8925,0.8058,0.7315,0.8412,0.1896
+Traffic Source,Email,322,232,0.7205,True,,0.7726,0.9224,0.8409,0.7218,0.8729,0.1775
+Traffic Source,Missing,46,28,0.6087,False,Excluded ranking metrics: n=46 < 50,,,,,,
+Traffic Source,Organic,616,389,0.6315,True,,0.7118,0.8509,0.7752,0.7395,0.8311,0.1938
+Traffic Source,Paid Ads,457,295,0.6455,True,,0.7436,0.8847,0.808,0.7693,0.8574,0.1827
+Traffic Source,Referral,197,122,0.6193,True,,0.6993,0.8197,0.7547,0.7214,0.7978,0.2021
+Traffic Source,Social Media,362,230,0.6354,True,,0.7138,0.8565,0.7787,0.7249,0.8179,0.1979
+Age Group,18-25,381,243,0.6378,True,,0.7028,0.8272,0.7599,0.7121,0.8203,0.2001
+Age Group,26-35,701,469,0.669,True,,0.7536,0.8998,0.8202,0.7579,0.852,0.1808
+Age Group,36-45,639,401,0.6275,True,,0.7119,0.8504,0.775,0.7494,0.8386,0.1928
+Age Group,46-60,222,144,0.6486,True,,0.7191,0.8889,0.795,0.7192,0.8288,0.1973
+Age Group,60+,13,10,0.7692,False,Excluded ranking metrics: n=13 < 50,,,,,,
+Age Group,Missing,44,29,0.6591,False,Excluded ranking metrics: n=44 < 50,,,,,,
+Target Class,Purchase (1),1296,1296,1.0,True,Single-class slice: Recall=class accuracy; ROC-AUC/PR-AUC not defined for single class,,0.8688,,,,0.1142
+Target Class,No Purchase (0),704,0,0.0,True,Single-class slice: Recall=class accuracy; ROC-AUC/PR-AUC not defined for single class,,0.402,,,,0.3304

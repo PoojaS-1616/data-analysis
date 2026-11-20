@@ -1,0 +1,615 @@
+{
+  "split_design": {
+    "total_rows": 10000,
+    "train_inner_rows": 6400,
+    "validation_rows": 1600,
+    "train_full_rows": 8000,
+    "untouched_test_rows": 2000,
+    "random_state": 42
+  },
+  "phase8_1_threshold_selection": {
+    "oof_5fold_best_f1_threshold": 0.4,
+    "oof_5fold_best_f1": 0.801,
+    "strategies": {
+      "default_0.50": {
+        "selected_threshold": 0.5,
+        "criterion": "Standard probability cutoff (t = 0.50)",
+        "validation_metrics": {
+          "threshold": 0.5,
+          "accuracy": 0.6987,
+          "precision": 0.724,
+          "recall": 0.865,
+          "f1": 0.7882,
+          "roc_auc": 0.7355,
+          "pr_auc": 0.8313,
+          "log_loss": 0.5672,
+          "brier_score": 0.1931,
+          "predicted_positive_count": 1239,
+          "predicted_positive_rate": 0.7744,
+          "confusion_matrix": {
+            "TN": 221,
+            "FP": 342,
+            "FN": 140,
+            "TP": 897
+          },
+          "expected_utility_inr": 139230.0
+        },
+        "untouched_test_metrics": {
+          "threshold": 0.5,
+          "accuracy": 0.7045,
+          "precision": 0.7279,
+          "recall": 0.8688,
+          "f1": 0.7921,
+          "roc_auc": 0.7411,
+          "pr_auc": 0.8388,
+          "log_loss": 0.5594,
+          "brier_score": 0.1903,
+          "predicted_positive_count": 1547,
+          "predicted_positive_rate": 0.7735,
+          "confusion_matrix": {
+            "TN": 283,
+            "FP": 421,
+            "FN": 170,
+            "TP": 1126
+          }
+        }
+      },
+      "val_f1_optimal": {
+        "selected_threshold": 0.4,
+        "criterion": "Maximize F1-score on validation set",
+        "validation_metrics": {
+          "threshold": 0.4,
+          "accuracy": 0.6937,
+          "precision": 0.6922,
+          "recall": 0.9499,
+          "f1": 0.8008,
+          "roc_auc": 0.7355,
+          "pr_auc": 0.8313,
+          "log_loss": 0.5672,
+          "brier_score": 0.1931,
+          "predicted_positive_count": 1423,
+          "predicted_positive_rate": 0.8894,
+          "confusion_matrix": {
+            "TN": 125,
+            "FP": 438,
+            "FN": 52,
+            "TP": 985
+          },
+          "expected_utility_inr": 148830.0
+        },
+        "untouched_test_metrics": {
+          "threshold": 0.4,
+          "accuracy": 0.6965,
+          "precision": 0.693,
+          "recall": 0.9545,
+          "f1": 0.803,
+          "roc_auc": 0.7411,
+          "pr_auc": 0.8388,
+          "log_loss": 0.5594,
+          "brier_score": 0.1903,
+          "predicted_positive_count": 1785,
+          "predicted_positive_rate": 0.8925,
+          "confusion_matrix": {
+            "TN": 156,
+            "FP": 548,
+            "FN": 59,
+            "TP": 1237
+          }
+        }
+      },
+      "high_recall_ge90": {
+        "selected_threshold": 0.47,
+        "criterion": "Validation Recall >= 0.90 with maximum precision",
+        "validation_metrics": {
+          "threshold": 0.47,
+          "accuracy": 0.6994,
+          "precision": 0.7119,
+          "recall": 0.9007,
+          "f1": 0.7952,
+          "roc_auc": 0.7355,
+          "pr_auc": 0.8313,
+          "log_loss": 0.5672,
+          "brier_score": 0.1931,
+          "predicted_positive_count": 1312,
+          "predicted_positive_rate": 0.82,
+          "confusion_matrix": {
+            "TN": 185,
+            "FP": 378,
+            "FN": 103,
+            "TP": 934
+          },
+          "expected_utility_inr": 143550.0
+        },
+        "untouched_test_metrics": {
+          "threshold": 0.47,
+          "accuracy": 0.709,
+          "precision": 0.7198,
+          "recall": 0.902,
+          "f1": 0.8007,
+          "roc_auc": 0.7411,
+          "pr_auc": 0.8388,
+          "log_loss": 0.5594,
+          "brier_score": 0.1903,
+          "predicted_positive_count": 1624,
+          "predicted_positive_rate": 0.812,
+          "confusion_matrix": {
+            "TN": 249,
+            "FP": 455,
+            "FN": 127,
+            "TP": 1169
+          }
+        }
+      },
+      "high_precision_ge80": {
+        "selected_threshold": 0.67,
+        "criterion": "Validation Precision >= 0.80 with maximum recall",
+        "validation_metrics": {
+          "threshold": 0.67,
+          "accuracy": 0.6619,
+          "precision": 0.8039,
+          "recall": 0.6326,
+          "f1": 0.708,
+          "roc_auc": 0.7355,
+          "pr_auc": 0.8313,
+          "log_loss": 0.5672,
+          "brier_score": 0.1931,
+          "predicted_positive_count": 816,
+          "predicted_positive_rate": 0.51,
+          "confusion_matrix": {
+            "TN": 403,
+            "FP": 160,
+            "FN": 381,
+            "TP": 656
+          },
+          "expected_utility_inr": 107680.0
+        },
+        "untouched_test_metrics": {
+          "threshold": 0.67,
+          "accuracy": 0.6575,
+          "precision": 0.8083,
+          "recall": 0.6181,
+          "f1": 0.7005,
+          "roc_auc": 0.7411,
+          "pr_auc": 0.8388,
+          "log_loss": 0.5594,
+          "brier_score": 0.1903,
+          "predicted_positive_count": 991,
+          "predicted_positive_rate": 0.4955,
+          "confusion_matrix": {
+            "TN": 514,
+            "FP": 190,
+            "FN": 495,
+            "TP": 801
+          }
+        }
+      },
+      "cost_sensitive": {
+        "selected_threshold": 0.3,
+        "criterion": "Maximize validation utility (TP * INR 180 - FP * INR 65)",
+        "validation_metrics": {
+          "threshold": 0.3,
+          "accuracy": 0.6675,
+          "precision": 0.6634,
+          "recall": 0.9884,
+          "f1": 0.794,
+          "roc_auc": 0.7355,
+          "pr_auc": 0.8313,
+          "log_loss": 0.5672,
+          "brier_score": 0.1931,
+          "predicted_positive_count": 1545,
+          "predicted_positive_rate": 0.9656,
+          "confusion_matrix": {
+            "TN": 43,
+            "FP": 520,
+            "FN": 12,
+            "TP": 1025
+          },
+          "expected_utility_inr": 150700.0
+        },
+        "untouched_test_metrics": {
+          "threshold": 0.3,
+          "accuracy": 0.6745,
+          "precision": 0.6681,
+          "recall": 0.9892,
+          "f1": 0.7975,
+          "roc_auc": 0.7411,
+          "pr_auc": 0.8388,
+          "log_loss": 0.5594,
+          "brier_score": 0.1903,
+          "predicted_positive_count": 1919,
+          "predicted_positive_rate": 0.9595,
+          "confusion_matrix": {
+            "TN": 67,
+            "FP": 637,
+            "FN": 14,
+            "TP": 1282
+          }
+        }
+      }
+    }
+  },
+  "phase8_2_calibration": {
+    "selected_on_validation": "uncalibrated_lr",
+    "validation_comparison": {
+      "uncalibrated_lr": {
+        "brier_score": 0.1931,
+        "log_loss": 0.5672,
+        "ece_10bin_uniform": 0.0208,
+        "calibration_intercept": -0.0249,
+        "calibration_slope": 1.0098,
+        "roc_auc": 0.7355,
+        "pr_auc": 0.8313
+      },
+      "sigmoid_calibrated": {
+        "brier_score": 0.1931,
+        "log_loss": 0.5673,
+        "ece_10bin_uniform": 0.0196,
+        "calibration_intercept": -0.0456,
+        "calibration_slope": 1.0495,
+        "roc_auc": 0.7356,
+        "pr_auc": 0.8314
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.1941,
+        "log_loss": 0.5703,
+        "ece_10bin_uniform": 0.031,
+        "calibration_intercept": 0.0121,
+        "calibration_slope": 0.9372,
+        "roc_auc": 0.735,
+        "pr_auc": 0.8301
+      }
+    },
+    "untouched_test_comparison": {
+      "uncalibrated_lr": {
+        "brier_score": 0.1903,
+        "log_loss": 0.5594,
+        "ece_10bin_uniform": 0.0236,
+        "calibration_intercept": -0.0476,
+        "calibration_slope": 1.0894,
+        "roc_auc": 0.7411,
+        "pr_auc": 0.8388,
+        "band_breakdown": [
+          {
+            "band": "0.0-0.1",
+            "count": 1,
+            "mean_predicted": 0.0915,
+            "observed_rate": 0.0,
+            "abs_error": 0.0915
+          },
+          {
+            "band": "0.1-0.2",
+            "count": 18,
+            "mean_predicted": 0.1682,
+            "observed_rate": 0.0556,
+            "abs_error": 0.1127
+          },
+          {
+            "band": "0.2-0.3",
+            "count": 62,
+            "mean_predicted": 0.2582,
+            "observed_rate": 0.2097,
+            "abs_error": 0.0485
+          },
+          {
+            "band": "0.3-0.4",
+            "count": 134,
+            "mean_predicted": 0.3532,
+            "observed_rate": 0.3358,
+            "abs_error": 0.0174
+          },
+          {
+            "band": "0.4-0.5",
+            "count": 238,
+            "mean_predicted": 0.4523,
+            "observed_rate": 0.4664,
+            "abs_error": 0.0141
+          },
+          {
+            "band": "0.5-0.6",
+            "count": 316,
+            "mean_predicted": 0.5551,
+            "observed_rate": 0.5443,
+            "abs_error": 0.0108
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 348,
+            "mean_predicted": 0.6513,
+            "observed_rate": 0.6868,
+            "abs_error": 0.0355
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 399,
+            "mean_predicted": 0.7498,
+            "observed_rate": 0.7168,
+            "abs_error": 0.033
+          },
+          {
+            "band": "0.8-0.9",
+            "count": 339,
+            "mean_predicted": 0.8454,
+            "observed_rate": 0.8496,
+            "abs_error": 0.0041
+          },
+          {
+            "band": "0.9-1.0",
+            "count": 145,
+            "mean_predicted": 0.9304,
+            "observed_rate": 0.9724,
+            "abs_error": 0.0421
+          }
+        ]
+      },
+      "sigmoid_calibrated": {
+        "brier_score": 0.1904,
+        "log_loss": 0.5597,
+        "ece_10bin_uniform": 0.022,
+        "calibration_intercept": -0.0648,
+        "calibration_slope": 1.1224,
+        "roc_auc": 0.7411,
+        "pr_auc": 0.8388,
+        "band_breakdown": [
+          {
+            "band": "0.0-0.1",
+            "count": 1,
+            "mean_predicted": 0.0994,
+            "observed_rate": 0.0,
+            "abs_error": 0.0994
+          },
+          {
+            "band": "0.1-0.2",
+            "count": 17,
+            "mean_predicted": 0.1756,
+            "observed_rate": 0.0588,
+            "abs_error": 0.1168
+          },
+          {
+            "band": "0.2-0.3",
+            "count": 55,
+            "mean_predicted": 0.2605,
+            "observed_rate": 0.2364,
+            "abs_error": 0.0242
+          },
+          {
+            "band": "0.3-0.4",
+            "count": 137,
+            "mean_predicted": 0.3558,
+            "observed_rate": 0.3285,
+            "abs_error": 0.0273
+          },
+          {
+            "band": "0.4-0.5",
+            "count": 227,
+            "mean_predicted": 0.4531,
+            "observed_rate": 0.4626,
+            "abs_error": 0.0095
+          },
+          {
+            "band": "0.5-0.6",
+            "count": 332,
+            "mean_predicted": 0.5546,
+            "observed_rate": 0.5361,
+            "abs_error": 0.0184
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 354,
+            "mean_predicted": 0.6516,
+            "observed_rate": 0.6808,
+            "abs_error": 0.0292
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 411,
+            "mean_predicted": 0.7497,
+            "observed_rate": 0.7275,
+            "abs_error": 0.0222
+          },
+          {
+            "band": "0.8-0.9",
+            "count": 336,
+            "mean_predicted": 0.8458,
+            "observed_rate": 0.8512,
+            "abs_error": 0.0054
+          },
+          {
+            "band": "0.9-1.0",
+            "count": 130,
+            "mean_predicted": 0.9294,
+            "observed_rate": 0.9846,
+            "abs_error": 0.0552
+          }
+        ]
+      },
+      "isotonic_calibrated": {
+        "brier_score": 0.1907,
+        "log_loss": 0.56,
+        "ece_10bin_uniform": 0.0209,
+        "calibration_intercept": -0.0285,
+        "calibration_slope": 1.048,
+        "roc_auc": 0.7405,
+        "pr_auc": 0.837,
+        "band_breakdown": [
+          {
+            "band": "0.0-0.1",
+            "count": 17,
+            "mean_predicted": 0.0804,
+            "observed_rate": 0.0588,
+            "abs_error": 0.0216
+          },
+          {
+            "band": "0.1-0.2",
+            "count": 33,
+            "mean_predicted": 0.1649,
+            "observed_rate": 0.2121,
+            "abs_error": 0.0473
+          },
+          {
+            "band": "0.2-0.3",
+            "count": 64,
+            "mean_predicted": 0.2809,
+            "observed_rate": 0.25,
+            "abs_error": 0.0309
+          },
+          {
+            "band": "0.3-0.4",
+            "count": 98,
+            "mean_predicted": 0.3396,
+            "observed_rate": 0.3469,
+            "abs_error": 0.0074
+          },
+          {
+            "band": "0.4-0.5",
+            "count": 178,
+            "mean_predicted": 0.4642,
+            "observed_rate": 0.4382,
+            "abs_error": 0.026
+          },
+          {
+            "band": "0.5-0.6",
+            "count": 395,
+            "mean_predicted": 0.5614,
+            "observed_rate": 0.5418,
+            "abs_error": 0.0196
+          },
+          {
+            "band": "0.6-0.7",
+            "count": 341,
+            "mean_predicted": 0.6493,
+            "observed_rate": 0.6833,
+            "abs_error": 0.034
+          },
+          {
+            "band": "0.7-0.8",
+            "count": 423,
+            "mean_predicted": 0.7513,
+            "observed_rate": 0.7352,
+            "abs_error": 0.016
+          },
+          {
+            "band": "0.8-0.9",
+            "count": 284,
+            "mean_predicted": 0.8447,
+            "observed_rate": 0.8521,
+            "abs_error": 0.0074
+          },
+          {
+            "band": "0.9-1.0",
+            "count": 167,
+            "mean_predicted": 0.9326,
+            "observed_rate": 0.9581,
+            "abs_error": 0.0255
+          }
+        ]
+      }
+    }
+  },
+  "phase8_3_model_comparison": [
+    {
+      "Model": "DummyClassifier",
+      "Selected_Config_Val": "strategy=prior",
+      "Val_ROC_AUC": 0.5,
+      "Test_ROC_AUC": 0.5,
+      "Test_PR_AUC": 0.648,
+      "Test_Precision": 0.648,
+      "Test_Recall": 1.0,
+      "Test_F1": 0.7864,
+      "Test_Accuracy": 0.648,
+      "Test_Log_Loss": 0.6487,
+      "Test_Brier": 0.2281,
+      "Test_ECE_10Bin": 0.0,
+      "Inference_Time_ms_2k": 13.12,
+      "Complexity": "Trivial (1 prior constant)",
+      "Interpretability": "High (Baseline only)"
+    },
+    {
+      "Model": "LogisticRegression",
+      "Selected_Config_Val": "C=0.1",
+      "Val_ROC_AUC": 0.7357,
+      "Test_ROC_AUC": 0.7405,
+      "Test_PR_AUC": 0.8384,
+      "Test_Precision": 0.7256,
+      "Test_Recall": 0.8711,
+      "Test_F1": 0.7917,
+      "Test_Accuracy": 0.703,
+      "Test_Log_Loss": 0.5599,
+      "Test_Brier": 0.1905,
+      "Test_ECE_10Bin": 0.024,
+      "Inference_Time_ms_2k": 15.52,
+      "Complexity": "Low (26 linear weights + intercept)",
+      "Interpretability": "High (Exact standardized odds ratios)"
+    },
+    {
+      "Model": "RandomForest",
+      "Selected_Config_Val": "depth=10,leaf=5",
+      "Val_ROC_AUC": 0.7147,
+      "Test_ROC_AUC": 0.7344,
+      "Test_PR_AUC": 0.8329,
+      "Test_Precision": 0.6951,
+      "Test_Recall": 0.9429,
+      "Test_F1": 0.8003,
+      "Test_Accuracy": 0.695,
+      "Test_Log_Loss": 0.5815,
+      "Test_Brier": 0.1984,
+      "Test_ECE_10Bin": 0.0603,
+      "Inference_Time_ms_2k": 66.1,
+      "Complexity": "High (200 decision trees)",
+      "Interpretability": "Medium-Low (Feature importance only)"
+    },
+    {
+      "Model": "HistGradientBoosting",
+      "Selected_Config_Val": "depth=3,lr=0.05",
+      "Val_ROC_AUC": 0.7153,
+      "Test_ROC_AUC": 0.7302,
+      "Test_PR_AUC": 0.8311,
+      "Test_Precision": 0.7154,
+      "Test_Recall": 0.8804,
+      "Test_F1": 0.7893,
+      "Test_Accuracy": 0.6955,
+      "Test_Log_Loss": 0.5699,
+      "Test_Brier": 0.1943,
+      "Test_ECE_10Bin": 0.0218,
+      "Inference_Time_ms_2k": 17.1,
+      "Complexity": "Medium-High (Boosted tree ensemble)",
+      "Interpretability": "Low (Requires post-hoc SHAP/PDP)"
+    }
+  ],
+  "phase8_5_subgroup_robustness": {
+    "min_subgroup_n": 50,
+    "min_class_n": 10,
+    "total_subgroups_evaluated": 22,
+    "flagged_small_subgroups": [
+      {
+        "Dimension": "Device Type",
+        "Subgroup": "Missing",
+        "Sample_Count": 27,
+        "Warning": "Excluded ranking metrics: n=27 < 50"
+      },
+      {
+        "Dimension": "Membership Type",
+        "Subgroup": "Missing",
+        "Sample_Count": 41,
+        "Warning": "Excluded ranking metrics: n=41 < 50"
+      },
+      {
+        "Dimension": "Traffic Source",
+        "Subgroup": "Missing",
+        "Sample_Count": 46,
+        "Warning": "Excluded ranking metrics: n=46 < 50"
+      },
+      {
+        "Dimension": "Age Group",
+        "Subgroup": "60+",
+        "Sample_Count": 13,
+        "Warning": "Excluded ranking metrics: n=13 < 50"
+      },
+      {
+        "Dimension": "Age Group",
+        "Subgroup": "Missing",
+        "Sample_Count": 44,
+        "Warning": "Excluded ranking metrics: n=44 < 50"
+      }
+    ]
+  }
+}
