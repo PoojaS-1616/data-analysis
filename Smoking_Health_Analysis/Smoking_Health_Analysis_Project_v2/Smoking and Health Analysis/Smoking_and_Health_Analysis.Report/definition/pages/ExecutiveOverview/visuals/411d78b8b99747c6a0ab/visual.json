@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "411d78b8b99747c6a0ab",
   "position": {
-    "x": 489.36170212765961,
-    "y": 148.93617021276597,
+    "x": 773.5,
+    "y": 134,
     "z": 6000,
-    "height": 116.66666666666667,
-    "width": 161.11111111111111
+    "height": 110,
+    "width": 238
   },
   "visual": {
     "visualType": "card",
@@ -38,7 +38,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "22D"
+                  "Value": "24D"
                 }
               }
             },
@@ -47,7 +47,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0F4C81'"
+                      "Value": "'#2563EB'"
                     }
                   }
                 }
@@ -62,25 +62,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "fontSize": {
-              "expr": {
-                "Literal": {
-                  "Value": "9.5D"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#6C7A89'"
-                    }
-                  }
+                  "Value": "false"
                 }
               }
             }
@@ -102,7 +84,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'KPI 3: Patients w/ Organ'"
+                  "Value": "'Recorded Organ Category'"
                 }
               }
             },
@@ -113,14 +95,83 @@
                 }
               }
             },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10.5D"
+                }
+              }
+            },
             "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0F4C81'"
+                      "Value": "'#334155'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#CBD5E1'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

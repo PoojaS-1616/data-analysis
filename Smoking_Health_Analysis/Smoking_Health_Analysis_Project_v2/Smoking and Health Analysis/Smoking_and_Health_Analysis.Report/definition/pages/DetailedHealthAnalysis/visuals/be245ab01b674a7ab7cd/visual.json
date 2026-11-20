@@ -2,14 +2,14 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "be245ab01b674a7ab7cd",
   "position": {
-    "x": 16.939407231029513,
-    "y": 462.76621325349493,
-    "z": 50,
-    "height": 233.55571795657607,
-    "width": 928.58750548279966
+    "x": 16,
+    "y": 422,
+    "z": 6000,
+    "height": 282,
+    "width": 616
   },
   "visual": {
-    "visualType": "hundredPercentStackedBarChart",
+    "visualType": "barChart",
     "query": {
       "queryState": {
         "Category": {
@@ -30,23 +30,6 @@
             }
           ]
         },
-        "Series": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Smoking_Health_Analysis"
-                    }
-                  },
-                  "Property": "Health_Condition"
-                }
-              },
-              "queryRef": "Smoking_Health_Analysis.Health_Condition"
-            }
-          ]
-        },
         "Y": {
           "projections": [
             {
@@ -57,17 +40,17 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Total Patients"
+                  "Property": "Recorded Condition Rate"
                 }
               },
-              "queryRef": "_Measures.Total Patients"
+              "queryRef": "_Measures.Recorded Condition Rate"
             }
           ]
         }
       }
     },
     "objects": {
-      "legend": [
+      "labels": [
         {
           "properties": {
             "show": {
@@ -77,17 +60,10 @@
                 }
               }
             },
-            "position": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Right'"
-                }
-              }
-            },
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "9.5D"
                 }
               }
             }
@@ -100,7 +76,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8.5D"
+                  "Value": "9D"
                 }
               }
             }
@@ -113,20 +89,24 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "8D"
+                  "Value": "8.5D"
                 }
               }
             }
           }
         }
       ],
-      "labels": [
+      "dataPoint": [
         {
           "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0D9488'"
+                    }
+                  }
                 }
               }
             }
@@ -148,7 +128,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Health Condition Distribution by Smoking Exposure (%)'"
+                  "Value": "'Recorded Condition Rate (%) by Exposure (Former = 0 Current PY)'"
                 }
               }
             },
@@ -159,14 +139,83 @@
                 }
               }
             },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10.5D"
+                }
+              }
+            },
             "fontColor": {
               "solid": {
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#0F4C81'"
+                      "Value": "'#0F2942'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#CBD5E1'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

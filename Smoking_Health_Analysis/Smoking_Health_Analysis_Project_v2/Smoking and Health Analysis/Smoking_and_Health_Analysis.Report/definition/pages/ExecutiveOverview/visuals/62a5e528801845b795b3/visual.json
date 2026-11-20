@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "62a5e528801845b795b3",
   "position": {
-    "x": 10,
-    "y": 10,
+    "x": 16,
+    "y": 12,
     "z": 0,
     "height": 48,
-    "width": 1260
+    "width": 1248
   },
   "visual": {
     "visualType": "textbox",
@@ -18,24 +18,89 @@
               {
                 "textRuns": [
                   {
-                    "value": "Smoking and Health Analysis Dashboard",
+                    "value": "Smoking & Health Analysis",
                     "textStyle": {
+                      "fontFamily": "Segoe UI Semibold",
                       "fontWeight": "bold",
-                      "fontSize": "14pt",
-                      "color": "#2b2d42"
+                      "fontSize": "15pt",
+                      "color": "#FFFFFF"
                     }
                   },
                   {
-                    "value": "   —   Executive Overview (Key Indicators, Smoking Patterns & Biomarkers)",
+                    "value": "   |   Executive Overview \u2014 Descriptive Healthcare Analytics (n = 10,000; Non-Causal)",
                     "textStyle": {
-                      "fontStyle": "italic",
-                      "fontSize": "9.5pt",
-                      "color": "#6c7a89"
+                      "fontFamily": "Segoe UI",
+                      "fontSize": "10pt",
+                      "color": "#CBD5E1"
                     }
                   }
                 ]
               }
             ]
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F2942'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#0F2942'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
+                }
+              }
+            }
           }
         }
       ]

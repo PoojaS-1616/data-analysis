@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "d42b2da9b5354198b5b2",
   "position": {
-    "x": 539.3617021276596,
-    "y": 96.80851063829788,
-    "z": 30,
-    "height": 41.48936170212766,
-    "width": 231.91489361702128
+    "x": 860,
+    "y": 70,
+    "z": 3000,
+    "height": 54,
+    "width": 404
   },
   "visual": {
     "visualType": "slicer",
@@ -48,7 +48,15 @@
       ],
       "header": [
         {
-          "properties": {}
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -66,7 +74,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter: Smoking Status'"
+                  "Value": "'Smoking Status'"
                 }
               }
             },
@@ -74,6 +82,13 @@
               "expr": {
                 "Literal": {
                   "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10.5D"
                 }
               }
             },
@@ -85,6 +100,68 @@
                       "Value": "'#0F4C81'"
                     }
                   }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#CBD5E1'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8D"
                 }
               }
             }

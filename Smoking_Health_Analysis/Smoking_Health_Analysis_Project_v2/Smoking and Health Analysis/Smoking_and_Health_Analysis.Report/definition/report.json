@@ -60,6 +60,6 @@
     }
   ],
   "settings": {
-    "useEnhancedTooltips": false
+    "useEnhancedTooltips": true
   }
 }

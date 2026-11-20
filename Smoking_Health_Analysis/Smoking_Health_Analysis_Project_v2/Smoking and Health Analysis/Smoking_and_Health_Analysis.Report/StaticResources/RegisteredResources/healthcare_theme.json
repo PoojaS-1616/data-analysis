@@ -1,16 +1,49 @@
 {
-  "name": "Neutral Healthcare Theme",
+  "name": "Clinical Navy & Teal Enterprise Theme",
   "dataColors": [
     "#0F4C81",
-    "#008080",
-    "#D9534F",
-    "#F0AD4E",
-    "#5CB85C",
-    "#6C7A89",
-    "#8E44AD",
-    "#2C3E50"
+    "#0D9488",
+    "#2563EB",
+    "#D97706",
+    "#64748B",
+    "#0891B2",
+    "#7C3AED",
+    "#DC2626"
   ],
-  "background": "#F8F9FA",
-  "foreground": "#2B2D42",
-  "tableAccent": "#0F4C81"
+  "background": "#F1F5F9",
+  "foreground": "#0F172A",
+  "tableAccent": "#0F4C81",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#CBD5E1"
+              }
+            },
+            "radius": 8
+          }
+        ],
+        "dropShadow": [
+          {
+            "show": false
+          }
+        ]
+      }
+    }
+  }
 }
